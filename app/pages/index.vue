@@ -45,6 +45,25 @@ const skills = [
   { name: "Tailwind", icon: "/icons/tailwind.png" },
   { name: "Nuxt.js", icon: "/icons/nuxt.png" },
 ];
+const getImageUrl = (name: string) => {
+  return new URL(`../assets/images/${name}`, import.meta.url).href;
+};
+const projects = [
+  {
+    id: 1,
+    title: "Project Alpha",
+    bg: "background-image: linear-gradient(to right bottom, #ffffff, #fbfcff, #f3fbff, #e9faff, #dff9fd, #ccf1f2, #bae9e5, #aae1d6, #89d0c0, #67bfaa, #42ae93, #009d7b);",
+    imageName: "yayiha.png",
+    // content2: "/assets/images/yayiha cover.png",
+  },
+  {
+    id: 2,
+    title: "Project Beta",
+    bg: "linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%)",
+  },
+  { id: 3, title: "Project Gamma", bg: "#009d7b" }, // Solid color juga bisa
+  // { id: 4, title: "Project Delta", bg: "url('/images/yayiha cover.jpg') center/cover" },
+];
 
 let ctx: any; // GSAP Context
 
@@ -297,6 +316,24 @@ onMounted(() => {
         pin: true,
       },
     });
+    // Di dalam onMounted -> gsap.context
+    const projectTitles = document.querySelectorAll(".project-title-type");
+
+    projectTitles.forEach((title) => {
+      const originalText = title.innerText; // Ambil teks asli ("Healthcare ERP System")
+      title.innerText = ""; // Kosongkan dulu untuk persiapan efek ngetik
+
+      gsap.to(title, {
+        duration: 2,
+        text: originalText,
+        ease: "none",
+        scrollTrigger: {
+          trigger: title,
+          start: "top 80%", // Mulai ngetik saat card 80% muncul di layar
+          toggleActions: "play none none none", // Mainkan sekali saja
+        },
+      });
+    });
 
     // 4. ThreeJS
     initThreeScene();
@@ -384,9 +421,49 @@ onUnmounted(() => {
     <section ref="aboutSection" class="h-screen bg-black flex flex-col justify-center">
       <h2 class="text-center text-4xl font-bold mb-10">Selected Projects</h2>
       <div class="overflow-hidden">
-        <div ref="aboutTrack" class="flex gap-20 px-[10vw]">
-          <div v-for="i in 4" :key="i" class="project-card min-w-[70vw] h-[60vh] bg-zinc-900 rounded-3xl flex items-center justify-center border border-zinc-800">
-            <h3 class="text-4xl">Project #{{ i }}</h3>
+        <div ref="aboutTrack" class="flex gap-20 px-[10vw] w-fit">
+          <div
+            class="group project-card min-w-[70vw] h-[60vh] rounded-3xl flex flex-col items-center justify-center border border-zinc-800 p-10 relative overflow-hidden transition-all duration-700 ease-in-out cursor-pointer"
+            style="background: linear-gradient(to right bottom, #ffffff, #fbfcff, #f3fbff, #e9faff, #dff9fd, #ccf1f2, #bae9e5, #aae1d6, #89d0c0, #67bfaa, #42ae93, #009d7b)"
+          >
+            <div class="absolute inset-0 bg-black/40 group-hover:bg-black/0 transition-all duration-700 z-10"></div>
+
+            <img
+              src="../assets/images/yayiha.png"
+              alt="Project 1"
+              class="absolute z-20 w-[450px] top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 filter grayscale brightness-75 blur-[1px] drop-shadow-2xl transition-all duration-1000 ease-in-out group-hover:w-[300px] group-hover:left-[unset] group-hover:bottom-0 group-hover:right-5 group-hover:translate-x-0 group-hover:translate-y-0 group-hover:grayscale-0 group-hover:brightness-100 group-hover:blur-0 group-hover:scale-110"
+            />
+
+            <h3
+              class="project-title-type text-4xl font-black text-white top-1/2 right-1/2 translate-x-1/2 translate-y-1/2 group-hover:right-[unset] group-hover:translate-x-0 group-hover:translate-y-0 group-hover:text-black group-hover:top-10 duration-1000 group-hover:left-5 ease-in-out font-borel absolute z-30 transition-all drop-shadow-lg group-hover:drop-shadow-none"
+            >
+              Healthcare ERP System
+            </h3>
+            <p>desc</p>
+            <p>skill yang digunain apa apa aja</p>
+
+            <div class="absolute top-0 -right-32 w-full h-[120%] z-10 pointer-events-none">
+              <img src="../assets/images/yayiha2.png" class="absolute top-20 right-0 translate-y-[500px] group-hover:rotate-[0deg] group-hover:translate-y-[-200px] transition-all duration-700" />
+              <img
+                src="../assets/images/yayiha3.png"
+                class="absolute top-0 -right-24 opacity-40 blur-[1px] group-hover:blur-0 z-20 translate-y-[500px] group-hover:opacity-100 group-hover:translate-y-[-200px] transition-all duration-500"
+              />
+            </div>
+
+            <!-- <div class="absolute inset-0 bg-black/10 group-hover:bg-transparent transition-all duration-500"></div> -->
+          </div>
+
+          <div
+            class="project-card min-w-[70vw] h-[60vh] rounded-3xl flex flex-col items-center justify-center border border-zinc-800 p-10"
+            style="background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%)"
+          >
+            <img src="../assets/images/yayiha-cover.png" class="max-w-[500px] w-full object-contain mb-6 drop-shadow-2xl" alt="Project 2" />
+            <h3 class="text-4xl font-black text-white font-borel">Project Beta</h3>
+          </div>
+
+          <div class="project-card min-w-[70vw] h-[60vh] rounded-3xl flex flex-col items-center justify-center border border-zinc-800 p-10" style="background: #009d7b">
+            <h3 class="text-4xl font-black text-white">Project Gamma</h3>
+            <p class="text-white opacity-80 mt-4">Coming Soon</p>
           </div>
         </div>
       </div>
@@ -616,5 +693,8 @@ onUnmounted(() => {
   background-image: radial-gradient(#ffffff10 1px, transparent 1px);
   background-size: 30px 30px;
   z-index: -1;
+}
+.project-card {
+  background-image: linear-gradient(to right bottom, #ffffff, #fbfcff, #f3fbff, #e9faff, #dff9fd, #ccf1f2, #bae9e5, #aae1d6, #89d0c0, #67bfaa, #42ae93, #009d7b);
 }
 </style>
