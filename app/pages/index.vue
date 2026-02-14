@@ -431,22 +431,56 @@ onUnmounted(() => {
             <img
               src="../assets/images/yayiha.png"
               alt="Project 1"
-              class="absolute z-20 w-[450px] top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 filter grayscale brightness-75 blur-[1px] drop-shadow-2xl transition-all duration-1000 ease-in-out group-hover:w-[300px] group-hover:left-[unset] group-hover:bottom-0 group-hover:right-5 group-hover:translate-x-0 group-hover:translate-y-0 group-hover:grayscale-0 group-hover:brightness-100 group-hover:blur-0 group-hover:scale-110"
+              class="absolute z-20 w-[450px] top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 filter grayscale brightness-75 blur-[1px] drop-shadow-2xl transition-all duration-1000 ease-in-out group-hover:w-[200px] group-hover:left-[unset] group-hover:bottom-0 group-hover:right-5 group-hover:translate-x-0 group-hover:translate-y-16 group-hover:grayscale-0 group-hover:brightness-100 group-hover:blur-0 group-hover:scale-110"
             />
 
             <h3
-              class="project-title-type text-4xl font-black text-white top-1/2 right-1/2 translate-x-1/2 translate-y-1/2 group-hover:right-[unset] group-hover:translate-x-0 group-hover:translate-y-0 group-hover:text-black group-hover:top-10 duration-1000 group-hover:left-5 ease-in-out font-borel absolute z-30 transition-all drop-shadow-lg group-hover:drop-shadow-none"
+              class="project-title-type text-4xl font-black text-white top-1/2 right-1/2 translate-x-1/2 translate-y-1/2 group-hover:right-[unset] group-hover:translate-x-0 group-hover:translate-y-0 group-hover:text-black group-hover:top-20 duration-1000 group-hover:left-10 ease-in-out font-borel absolute z-30 transition-all drop-shadow-lg group-hover:drop-shadow-none"
             >
               Healthcare ERP System
             </h3>
-            <p>desc</p>
-            <p>skill yang digunain apa apa aja</p>
+            <div class="w-[3px] bg-emerald-500 h-0 transition-all duration-1000 delay-700 group-hover:h-full"></div>
+            <h4
+              class="absolute left-10 top-32 text-lg text-start text-zinc-700 leading-relaxed w-[45%] opacity-0 translate-y-10 transition-all duration-700 delay-1000 group-hover:opacity-100 group-hover:translate-y-0"
+            >
+              An integrated clinic management system designed to streamline and unify operational workflows across multiple roles. This system enhances efficiency, ensures seamless patient handling,
+              and centralizes data management to optimize daily clinical operations.
+            </h4>
+
+            <div class="absolute bottom-10 left-10">
+              <div class="grid grid-cols-5 gap-4">
+                <Button class="tech-icon delay-[600ms]" variant="text" raised>
+                  <img src="/icons/vue.png" width="26" />
+                </Button>
+                <Button class="tech-icon delay-[700ms]" variant="text" raised>
+                  <img src="/icons/tailwind.png" width="26" />
+                </Button>
+                <Button class="tech-icon delay-[800ms]" variant="text" raised>
+                  <img src="/icons/flask.png" width="26" />
+                </Button>
+                <Button class="tech-icon delay-[900ms]" variant="text" raised>
+                  <img src="/icons/python.png" width="26" />
+                </Button>
+                <Button class="tech-icon delay-[1000ms]" variant="text" raised>
+                  <img src="/icons/postgresql.png" width="26" />
+                </Button>
+                <Button class="tech-icon delay-[400ms]" variant="text" raised>
+                  <img src="/icons/pinia.png" width="26" />
+                </Button>
+                <Button class="tech-icon delay-[500ms]" variant="text" raised>
+                  <img src="/icons/socket-io.png" width="26" />
+                </Button>
+              </div>
+            </div>
 
             <div class="absolute top-0 -right-32 w-full h-[120%] z-10 pointer-events-none">
-              <img src="../assets/images/yayiha2.png" class="absolute top-20 right-0 translate-y-[500px] group-hover:rotate-[0deg] group-hover:translate-y-[-200px] transition-all duration-700" />
+              <img
+                src="../assets/images/yayiha2.png"
+                class="absolute w-3/5 top-20 right-0 translate-y-[500px] group-hover:rotate-[0deg] group-hover:translate-y-[-100px] transition-all duration-700"
+              />
               <img
                 src="../assets/images/yayiha3.png"
-                class="absolute top-0 -right-24 opacity-40 blur-[1px] group-hover:blur-0 z-20 translate-y-[500px] group-hover:opacity-100 group-hover:translate-y-[-200px] transition-all duration-500"
+                class="absolute top-0 w-3/5 -right-24 opacity-40 blur-[1px] group-hover:blur-0 z-20 translate-y-[500px] group-hover:opacity-100 group-hover:translate-y-[-100px] transition-all duration-500"
               />
             </div>
 
@@ -696,5 +730,22 @@ onUnmounted(() => {
 }
 .project-card {
   background-image: linear-gradient(to right bottom, #ffffff, #fbfcff, #f3fbff, #e9faff, #dff9fd, #ccf1f2, #bae9e5, #aae1d6, #89d0c0, #67bfaa, #42ae93, #009d7b);
+}
+/* Style untuk Icon agar muncul satu-persatu dari bawah */
+.tech-icon {
+  @apply opacity-0 translate-y-20 transition-all duration-500 ease-out;
+  background: rgba(255, 255, 255, 0.4) !important;
+  backdrop-filter: blur(4px);
+  border: 1px solid rgba(255, 255, 255, 0.2) !important;
+}
+
+.group:hover .tech-icon {
+  @apply opacity-100 translate-y-0;
+}
+
+/* Hover effect tambahan untuk masing-masing icon */
+.tech-icon:hover {
+  transform: translateY(-5px) scale(1.1) !important;
+  background: white !important;
 }
 </style>
