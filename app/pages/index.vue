@@ -44,6 +44,19 @@ const skills = [
   { name: "TypeScript", icon: "/icons/typescript.png" },
   { name: "Tailwind", icon: "/icons/tailwind.png" },
   { name: "Nuxt.js", icon: "/icons/nuxt.png" },
+  { name: "Bootstrap", icon: "/icons/bootstrap.png" },
+  { name: "BigTable", icon: "/icons/Bigtable.png" },
+  { name: "BigQuery", icon: "/icons/BigQuery.png" },
+  { name: "Vertex AI", icon: "/icons/Vertex AI.png" },
+  { name: "Flask", icon: "/icons/flask.png" },
+  { name: "Git", icon: "/icons/git.png" },
+  { name: "MySQL", icon: "/icons/mysql.png" },
+  { name: "PostgreSQL", icon: "/icons/postgresql.png" },
+  { name: "Python", icon: "/icons/python.png" },
+  { name: "Pinia", icon: "/icons/pinia.png" },
+  { name: "Socket.io", icon: "/icons/socket-io.png" },
+  { name: "Express", icon: "/icons/express.png" },
+  { name: "SSE", icon: "/icons/sse.png" },
 ];
 const getImageUrl = (name: string) => {
   return new URL(`../assets/images/${name}`, import.meta.url).href;
@@ -66,88 +79,22 @@ const projects = [
 ];
 
 let ctx: any; // GSAP Context
-
-/* ====================== THREE.JS LOGIC (Floating Icons) ====================== */
-// const initThreeScene = () => {
-//   if (!canvas.value || !cubeSection.value) return;
-
-//   const scene = new THREE.Scene();
-//   const { width, height } = cubeSection.value.getBoundingClientRect();
-//   const camera = new THREE.PerspectiveCamera(75, width / height, 0.1, 1000);
-//   camera.position.z = 5;
-
-//   const renderer = new THREE.WebGLRenderer({ canvas: canvas.value, alpha: true, antialias: true });
-//   renderer.setSize(width, height);
-//   renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-
-//   const ambientLight = new THREE.AmbientLight(0xffffff, 1);
-//   scene.add(ambientLight);
-
-//   const loader = new THREE.TextureLoader();
-//   const iconGroups = new THREE.Group();
-//   scene.add(iconGroups);
-
-//   // Buat banyak floating icons
-//   skills.forEach((skill) => {
-//     const texture = loader.load(skill.icon);
-//     const material = new THREE.MeshBasicMaterial({ map: texture, transparent: true, side: THREE.DoubleSide });
-//     const geometry = new THREE.PlaneGeometry(0.8, 0.8);
-
-//     // Buat beberapa instance per icon biar rame
-//     for (let i = 0; i < 2; i++) {
-//       const mesh = new THREE.Mesh(geometry, material);
-//       mesh.position.set((Math.random() - 0.5) * 10, (Math.random() - 0.5) * 10, (Math.random() - 0.5) * 5);
-//       iconGroups.add(mesh);
-
-//       // GSAP Floating Animation per Mesh
-//       gsap.to(mesh.position, {
-//         x: `+=${(Math.random() - 0.5) * 2}`,
-//         y: `+=${(Math.random() - 0.5) * 2}`,
-//         duration: 3 + Math.random() * 2,
-//         repeat: -1,
-//         yoyo: true,
-//         ease: "sine.inOut",
-//       });
-//     }
-//   });
-
-//   // Scroll Interaction: Rotate group on scroll
-//   ScrollTrigger.create({
-//     trigger: cubeSection.value,
-//     start: "top bottom",
-//     end: "bottom top",
-//     scrub: 2,
-//     onUpdate: (self) => {
-//       iconGroups.rotation.y = self.progress * Math.PI * 2;
-//       iconGroups.rotation.z = self.progress * Math.PI;
-//     },
-//   });
-
-//   const animate = () => {
-//     renderer.render(scene, camera);
-//     requestAnimationFrame(animate);
-//   };
-//   animate();
-
-//   // Resize handler
-//   const handleResize = () => {
-//     const { width, height } = cubeSection.value!.getBoundingClientRect();
-//     camera.aspect = width / height;
-//     camera.updateProjectionMatrix();
-//     renderer.setSize(width, height);
-//   };
-//   window.addEventListener("resize", handleResize);
-// };
 /* ====================== THREE.JS LOGIC (Chaos to Order) ====================== */
+import { RoundedBoxGeometry } from "three-stdlib"; // Import ini di bagian atas script
+
 const initThreeScene = () => {
   if (!canvas.value || !cubeSection.value) return;
 
   const scene = new THREE.Scene();
   const { width, height } = cubeSection.value.getBoundingClientRect();
   const camera = new THREE.PerspectiveCamera(75, width / height, 0.1, 1000);
-  camera.position.z = 7;
+  camera.position.z = 8;
 
-  const renderer = new THREE.WebGLRenderer({ canvas: canvas.value, alpha: true, antialias: true });
+  const renderer = new THREE.WebGLRenderer({
+    canvas: canvas.value,
+    alpha: true,
+    antialias: true,
+  });
   renderer.setSize(width, height);
   renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 
@@ -156,62 +103,67 @@ const initThreeScene = () => {
   const raycaster = new THREE.Raycaster();
   const mouse = new THREE.Vector2();
 
-  // Raycaster hover state
-  const hoveredSkill = ref("");
-
-  const ambientLight = new THREE.AmbientLight(0xffffff, 0.8);
+  // --- LIGHTING (Kunci Neumorphism adalah bayangan lembut) ---
+  const ambientLight = new THREE.AmbientLight(0xffffff, 0.6); // Cahaya dasar
   scene.add(ambientLight);
 
-  const pointLight = new THREE.PointLight(0xffffff, 1);
-  pointLight.position.set(5, 5, 5); // Cahaya dari pojok atas untuk shadow
-  scene.add(pointLight);
+  const frontLight = new THREE.DirectionalLight(0xffffff, 1);
+  frontLight.position.set(2, 2, 5); // Cahaya dari depan agak samping
+  scene.add(frontLight);
+
+  const backLight = new THREE.PointLight(0xffffff, 0.5);
+  backLight.position.set(-5, -5, -2); // Cahaya lemah dari belakang untuk depth
+  scene.add(backLight);
 
   skills.forEach((skill, i) => {
     const texture = loader.load(skill.icon);
 
-    // 1. Pake BoxGeometry tipis biar ada "kedalaman" (depth)
-    const geometry = new THREE.BoxGeometry(1.2, 1.2, 0.1);
+    // 1. Geometri dengan sudut bulat (lebar, tinggi, tebal, segmen, radius)
+    // Radius 0.1 di Three.js sudah terlihat seperti 10px-15px di CSS
+    const geometry = new RoundedBoxGeometry(1, 1, 0.2, 4, 0.1);
 
-    // 2. Gunakan MeshStandardMaterial untuk efek material nyata
+    // 2. Material Putih Bersih dengan tekstur ikon di depannya
     const material = new THREE.MeshStandardMaterial({
-      map: texture,
-      color: 0xffffff, // Warna dasar putih (neumorphism style)
-      roughness: 0.3,
-      metalness: 0.1,
-      transparent: true,
+      color: 0xffffff, // Warna putih dasar
+      map: texture, // Ikon tetap muncul di tengah
+      roughness: 0.15, // Agar ada sedikit kilauan halus
+      metalness: 0.05,
     });
 
     const mesh = new THREE.Mesh(geometry, material);
 
-    // 1. POSISI AWAL (ACAK/CHAOS)
+    // POSISI AWAL (Chaos)
     mesh.position.set((Math.random() - 0.5) * 15, (Math.random() - 0.5) * 15, (Math.random() - 0.5) * 10);
-    mesh.userData = { name: skill.name }; // Simpan nama buat hover
+    mesh.rotation.set(Math.random(), Math.random(), 0);
+    mesh.userData = { name: skill.name };
 
-    // 2. POSISI TARGET (RAPI/GRID)
-    const columns = 3;
-    const spacing = 2.5;
-    const targetX = (i % columns) * spacing - ((columns - 1) * spacing) / 2;
-    const targetY = -Math.floor(i / columns) * spacing + 1.5;
+    // POSISI TARGET (Grid)
+    const columns = 5;
+    const spacingX = 2.0;
+    const spacingY = 1.8;
+    const targetX = (i % columns) * spacingX - ((columns - 1) * spacingX) / 2;
+    const targetY = -Math.floor(i / columns) * spacingY + 2;
 
-    // 3. ANIMASI SCROLL (Chaos -> Order)
+    // ANIMASI SCROLL
     gsap.to(mesh.position, {
       x: targetX,
       y: targetY,
       z: 0,
-      ease: "power2.inOut",
-      scrollTrigger: {
-        trigger: cubeSection.value,
-        start: "top center", // Mulai rapi pas section masuk tengah layar
-        end: "top top", // Selesai rapi pas section full di layar
-        scrub: 1.5,
-      },
+      scrollTrigger: { trigger: cubeSection.value, start: "top center", end: "top 10%", scrub: 2 },
+    });
+
+    gsap.to(mesh.rotation, {
+      x: 0,
+      y: 0,
+      z: 0,
+      scrollTrigger: { trigger: cubeSection.value, start: "top center", end: "top 10%", scrub: 2 },
     });
 
     scene.add(mesh);
     meshes.push(mesh);
   });
 
-  // HOVER LOGIC
+  // --- HOVER LOGIC ---
   const onMouseMove = (event: MouseEvent) => {
     const rect = canvas.value!.getBoundingClientRect();
     mouse.x = ((event.clientX - rect.left) / width) * 2 - 1;
@@ -221,41 +173,29 @@ const initThreeScene = () => {
     const intersects = raycaster.intersectObjects(meshes);
 
     if (intersects.length > 0) {
-      const name = intersects[0].object.userData.name;
-      const el = document.getElementById("skill-name-display");
-      if (el) el.innerText = name;
       const obj = intersects[0].object as THREE.Mesh;
-      hoveredSkill.value = obj.userData.name;
+      document.getElementById("skill-name-display")!.innerText = obj.userData.name;
       document.body.style.cursor = "pointer";
-      // Animasi kecil pas hover
-      gsap.to(obj.scale, { x: 1.2, y: 1.2, duration: 0.3 });
+      // Efek Pop-up Neumorphism saat hover
+      gsap.to(obj.scale, { x: 1.3, y: 1.3, z: 1.3, duration: 0.3 });
     } else {
-      const el = document.getElementById("skill-name-display");
-      if (el) el.innerText = "";
-      hoveredSkill.value = "";
+      document.getElementById("skill-name-display")!.innerText = "";
       document.body.style.cursor = "default";
-      meshes.forEach((m) => gsap.to(m.scale, { x: 1, y: 1, duration: 0.3 }));
+      meshes.forEach((m) => gsap.to(m.scale, { x: 1, y: 1, z: 1, duration: 0.3 }));
     }
   };
 
   window.addEventListener("mousemove", onMouseMove);
 
   const animate = () => {
-    // Tambahin dikit rotasi biar tetep ada aura "floating"
     meshes.forEach((m, i) => {
-      m.rotation.y = Math.sin(Date.now() * 0.001 + i) * 0.1;
+      m.rotation.y += 0.005;
+      m.position.y += Math.sin(Date.now() * 0.001 + i) * 0.003;
     });
     renderer.render(scene, camera);
     requestAnimationFrame(animate);
   };
   animate();
-
-  // Expore hoveredSkill ke template lewat return atau defineExpose jika perlu
-  // Tapi karena ini di dalam script setup, kita pake cara simpel aja di bawah
-  (window as any).setHoveredName = (val: string) => {
-    const el = document.getElementById("skill-name-display");
-    if (el) el.innerText = val;
-  };
 };
 
 /* ====================== LIFECYCLE ====================== */
@@ -418,7 +358,7 @@ onUnmounted(() => {
       </div>
     </section>
 
-    <section ref="aboutSection" class="h-screen bg-black flex flex-col justify-center">
+    <section ref="aboutSection" class="h-screen flex flex-col justify-center">
       <h2 class="text-center text-4xl font-bold mb-10">Selected Projects</h2>
       <div class="overflow-hidden">
         <div ref="aboutTrack" class="flex gap-20 px-[10vw] w-fit">
@@ -470,6 +410,9 @@ onUnmounted(() => {
                 </Button>
                 <Button class="tech-icon delay-[500ms]" variant="text" raised>
                   <img src="/icons/socket-io.png" width="26" />
+                </Button>
+                <Button class="tech-icon delay-[500ms]" variant="text" raised>
+                  <img src="/icons/Bigtable.png" width="26" />
                 </Button>
               </div>
             </div>
@@ -535,6 +478,9 @@ onUnmounted(() => {
                 <Button class="tech-icon delay-[500ms]" variant="text" raised>
                   <img src="/icons/socket-io.png" width="26" />
                 </Button>
+                <Button class="tech-icon delay-[500ms]" variant="text" raised>
+                  <img src="/icons/Bigtable.png" width="26" />
+                </Button>
               </div>
             </div>
 
@@ -564,16 +510,16 @@ onUnmounted(() => {
             />
 
             <h3
-              class="project-title-type text-4xl font-black text-white top-1/2 right-1/2 translate-x-1/2 translate-y-1/2 group-hover:right-[unset] group-hover:translate-x-0 group-hover:translate-y-0 group-hover:text-black group-hover:top-20 duration-1000 group-hover:left-10 ease-in-out font-borel absolute z-30 transition-all drop-shadow-lg group-hover:drop-shadow-none"
+              class="project-title-type text-3xl font-black text-white top-1/2 right-1/2 translate-x-1/2 translate-y-1/2 group-hover:right-[unset] group-hover:translate-x-0 group-hover:translate-y-0 group-hover:text-black group-hover:top-20 duration-1000 group-hover:left-10 ease-in-out font-borel absolute z-30 transition-all drop-shadow-lg group-hover:drop-shadow-none"
             >
-              Healthcare ERP System
+              Customer Presentation System
             </h3>
             <div class="w-[3px] bg-white h-0 transition-all duration-1000 delay-700 group-hover:h-full"></div>
             <h4
               class="absolute left-10 top-32 text-lg text-start text-zinc-700 leading-relaxed w-[45%] opacity-0 translate-y-10 transition-all duration-700 delay-1000 group-hover:opacity-100 group-hover:translate-y-0"
             >
-              An integrated clinic management system designed to streamline and unify operational workflows across multiple roles. This system enhances efficiency, ensures seamless patient handling,
-              and centralizes data management to optimize daily clinical operations.
+              A comprehensive showcase platform designed for seamless client onboarding and product demonstrations. It centralizes all core functionalities into an explorable environment, allowing
+              users to experience the system’s efficiency and intuitive design firsthand.
             </h4>
 
             <div class="absolute bottom-10 left-10">
@@ -597,16 +543,16 @@ onUnmounted(() => {
                   <img src="/icons/pinia.png" width="26" />
                 </Button>
                 <Button class="tech-icon delay-[500ms]" variant="text" raised>
-                  <img src="/icons/socket-io.png" width="26" />
+                  <img src="/icons/sse.png" width="26" />
                 </Button>
               </div>
             </div>
 
             <div class="absolute top-0 -right-32 w-full h-[120%] z-10 pointer-events-none">
-              <img src="../assets/images/demo2.png" class="absolute w-3/5 top-20 right-0 translate-y-[500px] group-hover:rotate-[0deg] group-hover:translate-y-[-100px] transition-all duration-700" />
+              <img src="../assets/images/demo2.png" class="absolute w-3/5 top-48 right-0 translate-y-[500px] group-hover:rotate-[0deg] group-hover:translate-y-[-100px] transition-all duration-700" />
               <img
                 src="../assets/images/demo3.png"
-                class="absolute top-0 w-3/5 -right-24 opacity-40 blur-[1px] group-hover:blur-0 z-20 translate-y-[500px] group-hover:opacity-100 group-hover:translate-y-[-100px] transition-all duration-500"
+                class="absolute -top-14 w-3/5 -right-24 opacity-40 blur-[1px] group-hover:blur-0 z-20 translate-y-[500px] group-hover:opacity-100 group-hover:translate-y-[-100px] transition-all duration-500"
               />
             </div>
           </div>
@@ -614,27 +560,27 @@ onUnmounted(() => {
           <!-- TING -->
           <div
             class="group project-card min-w-[70vw] h-[60vh] rounded-3xl flex flex-col items-center justify-center border border-zinc-800 p-10 relative overflow-hidden transition-all duration-700 ease-in-out cursor-pointer"
-            style="background: linear-gradient(to right bottom, #ffffff, #fbfcff, #f3fbff, #e9faff, #dff9fd, #ccf1f2, #bae9e5, #aae1d6, #89d0c0, #67bfaa, #42ae93, #009d7b)"
+            style="background: linear-gradient(to right bottom, #ffffff, #f7f8ff, #ecf3ff, #ddeeff, #cbeaff, #b9e3fd, #a6ddfb, #91d6f8, #7acaf3, #63beee, #48b1ea, #24a5e5)"
           >
             <div class="absolute inset-0 bg-black/40 group-hover:bg-black/0 transition-all duration-700 z-10"></div>
 
             <img
               src="../assets/images/ting1.png"
               alt="Project 1"
-              class="absolute z-20 w-[450px] top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 filter grayscale brightness-75 blur-[1px] drop-shadow-2xl transition-all duration-1000 ease-in-out group-hover:w-[200px] group-hover:left-[unset] group-hover:bottom-0 group-hover:right-5 group-hover:translate-x-0 group-hover:translate-y-16 group-hover:grayscale-0 group-hover:brightness-100 group-hover:blur-0 group-hover:scale-110"
+              class="absolute z-20 w-[450px] top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 filter grayscale brightness-75 blur-[1px] drop-shadow-2xl transition-all duration-1000 ease-in-out group-hover:w-[200px] group-hover:left-[unset] group-hover:bottom-0 group-hover:right-5 group-hover:translate-x-0 group-hover:translate-y-8 group-hover:grayscale-0 group-hover:brightness-100 group-hover:blur-0 group-hover:scale-110"
             />
 
             <h3
               class="project-title-type text-4xl font-black text-white top-1/2 right-1/2 translate-x-1/2 translate-y-1/2 group-hover:right-[unset] group-hover:translate-x-0 group-hover:translate-y-0 group-hover:text-black group-hover:top-20 duration-1000 group-hover:left-10 ease-in-out font-borel absolute z-30 transition-all drop-shadow-lg group-hover:drop-shadow-none"
             >
-              Healthcare ERP System
+              SaaS ERP
             </h3>
-            <div class="w-[3px] bg-emerald-500 h-0 transition-all duration-1000 delay-700 group-hover:h-full"></div>
+            <div class="w-[3px] bg-white h-0 transition-all duration-1000 delay-700 group-hover:h-full"></div>
             <h4
-              class="absolute left-10 top-32 text-lg text-start text-zinc-700 leading-relaxed w-[45%] opacity-0 translate-y-10 transition-all duration-700 delay-1000 group-hover:opacity-100 group-hover:translate-y-0"
+              class="absolute left-10 top-28 text-lg text-start text-zinc-700 leading-relaxed w-[45%] opacity-0 translate-y-10 transition-all duration-700 delay-1000 group-hover:opacity-100 group-hover:translate-y-0"
             >
-              An integrated clinic management system designed to streamline and unify operational workflows across multiple roles. This system enhances efficiency, ensures seamless patient handling,
-              and centralizes data management to optimize daily clinical operations.
+              A comprehensive SaaS ERP ecosystem designed to serve as an integrated business platform, seamlessly unifying core operations from POS and Inventory to Accounting and Sales Management. By
+              establishing a single source of truth, this system empowers businesses to scale, centralizing data and streamlining complex workflows into one intuitive interface.
             </h4>
 
             <div class="absolute bottom-10 left-10">
@@ -658,16 +604,19 @@ onUnmounted(() => {
                   <img src="/icons/pinia.png" width="26" />
                 </Button>
                 <Button class="tech-icon delay-[500ms]" variant="text" raised>
-                  <img src="/icons/socket-io.png" width="26" />
+                  <img src="/icons/BigQuery.png" width="26" />
+                </Button>
+                <Button class="tech-icon delay-[500ms]" variant="text" raised>
+                  <img src="/icons/sse.png" width="26" />
                 </Button>
               </div>
             </div>
 
-            <div class="absolute top-0 -right-32 w-full h-[120%] z-10 pointer-events-none">
+            <div class="absolute top-12 -right-32 w-full h-[120%] z-10 pointer-events-none">
               <img src="../assets/images/ting2.png" class="absolute w-3/5 top-20 right-0 translate-y-[500px] group-hover:rotate-[0deg] group-hover:translate-y-[-100px] transition-all duration-700" />
               <img
                 src="../assets/images/ting3.png"
-                class="absolute top-0 w-3/5 -right-24 opacity-40 blur-[1px] group-hover:blur-0 z-20 translate-y-[500px] group-hover:opacity-100 group-hover:translate-y-[-100px] transition-all duration-500"
+                class="absolute -top-28 w-3/5 -right-20 opacity-40 blur-[1px] group-hover:blur-0 z-20 translate-y-[500px] group-hover:opacity-100 group-hover:translate-y-[-100px] transition-all duration-500"
               />
             </div>
           </div>
@@ -675,17 +624,15 @@ onUnmounted(() => {
       </div>
     </section>
 
-    <!-- <section ref="cubeSection" class="relative h-screen flex flex-col items-center justify-center bg-black">
-      <h2 class="absolute top-20 text-4xl font-bold z-10">Tech Stack Mastery</h2>
-      <canvas ref="canvas" class="w-full h-full"></canvas>
-    </section> -->
-    <section ref="cubeSection" class="relative h-screen flex flex-col items-center justify-center bg-white">
+    <section ref="cubeSection" class="relative min-h-screen flex flex-col items-center justify-center bg-[#050505]">
       <div class="absolute z-20 pointer-events-none text-center">
-        <h2 class="text-gray-500 uppercase tracking-widest text-sm mb-2">Tech Stack Mastery</h2>
-        <div id="skill-name-display" class="text-6xl font-black italic text-white min-h-[80px]"></div>
+        <h2 class="text-emerald-500 uppercase tracking-[0.5em] text-xs mb-4 opacity-70">Tech Stack Mastery</h2>
+        <div id="skill-name-display" class="text-7xl font-black italic text-white min-h-[100px] drop-shadow-[0_0_15px_rgba(255,255,255,0.3)] uppercase"></div>
       </div>
 
       <canvas ref="canvas" class="w-full h-full"></canvas>
+
+      <div class="absolute inset-0 pointer-events-none bg-[radial-gradient(circle_at_center,transparent_0%,#050505_80%)]"></div>
     </section>
   </main>
 </template>
@@ -919,5 +866,28 @@ onUnmounted(() => {
 .tech-icon:hover {
   transform: translateY(-5px) scale(1.1) !important;
   background: white !important;
+}
+/* Update font dan gaya untuk nama skill yang muncul */
+#skill-name-display {
+  font-family: "Inter", sans-serif; /* Atau font andalanmu */
+  transition: all 0.3s ease-in-out;
+}
+
+/* Mempercantik tampilan tech-icon di project card */
+.tech-icon {
+  @apply opacity-0 translate-y-10 transition-all duration-500 ease-out;
+  background: rgba(255, 255, 255, 0.2) !important;
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.3) !important;
+  border-radius: 12px !important;
+}
+
+.group:hover .tech-icon {
+  @apply opacity-100 translate-y-0;
+}
+
+/* Animasi khusus untuk judul proyek agar lebih smooth saat ngetik */
+.project-title-type {
+  letter-spacing: -0.02em;
 }
 </style>

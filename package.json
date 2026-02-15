@@ -15,6 +15,7 @@
     "primeicons": "^7.0.0",
     "primevue": "^4.5.4",
     "three": "^0.134.0",
+    "three-stdlib": "^2.36.1",
     "v-gsap-nuxt": "^1.5.11",
     "vanta": "^0.5.24",
     "vue": "^3.5.27",
