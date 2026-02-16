@@ -3,6 +3,7 @@ import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import * as THREE from "three";
 import { TextPlugin } from "gsap/TextPlugin";
+import { RoundedBoxGeometry } from "three-stdlib";
 
 // Matikan SSR karena Three.js butuh akses langsung ke DOM/Window
 definePageMeta({
@@ -38,25 +39,25 @@ const experience = [
 ];
 
 const skills = [
-  { name: "Vue.js", icon: "/icons/three/vue.png" },
-  { name: "React.js", icon: "/icons/three/react.png" },
-  { name: "JavaScript", icon: "/icons/javascript.png" },
-  { name: "TypeScript", icon: "/icons/typescript.png" },
-  { name: "Tailwind", icon: "/icons/three/tailwind.png" },
-  { name: "Nuxt.js", icon: "/icons/three/nuxt.png" },
-  { name: "Bootstrap", icon: "/icons/three/bootstrap.png" },
-  { name: "BigTable", icon: "/icons/Bigtable.png" },
-  { name: "BigQuery", icon: "/icons/BigQuery.png" },
-  { name: "Vertex AI", icon: "/icons/Vertex AI.png" },
-  { name: "Flask", icon: "/icons/three/flask.png" },
-  { name: "Git", icon: "/icons/three/git.png" },
-  { name: "MySQL", icon: "/icons/three/mysql.png" },
-  { name: "PostgreSQL", icon: "/icons/three/postgresql.png" },
-  { name: "Python", icon: "/icons/three/python.png" },
-  { name: "Pinia", icon: "/icons/three/pinia.png" },
-  { name: "Socket.io", icon: "/icons/three/socket-io.png" },
-  { name: "Express", icon: "/icons/three/express.png" },
-  { name: "SSE", icon: "/icons/three/sse.png" },
+  { name: "Vue.js", icon: "/icons/three/vue.png", color: "#F7DF1E" },
+  { name: "React.js", icon: "/icons/three/react.png", color: "#23272F" },
+  { name: "JavaScript", icon: "/icons/javascript.png", color: "#F7DF1E" },
+  { name: "TypeScript", icon: "/icons/typescript.png", color: "#007ACC" },
+  { name: "Tailwind", icon: "/icons/three/tailwind.png", color: "#030712" },
+  { name: "Nuxt.js", icon: "/icons/three/nuxt.png", color: ["#010618", "#00DC82"] },
+  { name: "Bootstrap", icon: "/icons/three/bootstrap.png", color: "#8F12FD" },
+  { name: "BigTable", icon: "/icons/Bigtable.png", color: "#D9D9D9" },
+  { name: "BigQuery", icon: "/icons/BigQuery.png", color: "#D9D9D9" },
+  { name: "Vertex AI", icon: "/icons/Vertex AI.png", color: "#D9D9D9" },
+  { name: "Flask", icon: "/icons/three/flask.png", color: "#D9D9D9" },
+  { name: "Git", icon: "/icons/three/git.png", color: "#2A2A2A" },
+  { name: "MySQL", icon: "/icons/three/mysql.png", color: "#D9D9D9" },
+  { name: "PostgreSQL", icon: "/icons/three/postgresql.png", color: "#1E415D" },
+  { name: "Python", icon: "/icons/three/python.png", color: "#1E415D" },
+  { name: "Pinia", icon: "/icons/three/pinia.png", color: ["#56D067", "#A69B35", "#131A27"] },
+  { name: "Socket.io", icon: "/icons/three/socket-io.png", color: "#D9D9D9" },
+  { name: "Express", icon: "/icons/three/express.png", color: "#D9D9D9" },
+  { name: "SSE", icon: "/icons/three/sse.png", color: "#5E17EC" },
 ];
 const getImageUrl = (name: string) => {
   return new URL(`../assets/images/${name}`, import.meta.url).href;
@@ -80,17 +81,44 @@ const projects = [
 
 let ctx: any; // GSAP Context
 /* ====================== THREE.JS LOGIC (Chaos to Order) ====================== */
-import { RoundedBoxGeometry } from "three-stdlib"; // Import ini di bagian atas script
 
+const createGradientTexture = (colors) => {
+  const canvas = document.createElement("canvas");
+  canvas.width = 256;
+  canvas.height = 256;
+  const ctx = canvas.getContext("2d");
+
+  // Membuat Linear Gradient dari atas ke bawah
+  const gradient = ctx.createLinearGradient(0, 0, 0, 256);
+  colors.forEach((color, index) => {
+    gradient.addColorStop(index / (colors.length - 1), color);
+  });
+
+  ctx.fillStyle = gradient;
+  ctx.fillRect(0, 0, 256, 256);
+
+  const texture = new THREE.CanvasTexture(canvas);
+  texture.needsUpdate = true;
+  return texture;
+};
 const initThreeScene = () => {
   if (!canvas.value || !cubeSection.value) return;
 
   const scene = new THREE.Scene();
+  const gridGroup = new THREE.Group(); // Buat wadah untuk semua kubus
+  scene.add(gridGroup);
   const { width, height } = cubeSection.value.getBoundingClientRect();
-  const camera = new THREE.PerspectiveCamera(75, width / height, 0.1, 1000);
+  // const camera = new THREE.PerspectiveCamera(75, width / height, 0.1, 1000);
+  const camera = new THREE.PerspectiveCamera(50, width / height, 0.01, 1000);
   // camera.position.z = 8;
-  camera.position.set(-4, -2, 7);
+  // camera.position.set(-4, -2, 7);
+  // camera.position.set(7.52, 7.91, -6.04);
+  camera.position.x = -2;
+  camera.position.y = 5;
+  camera.position.z = 10.044;
   camera.lookAt(0, 0, 0);
+  // camera.rotation.set(-121.57 * (Math.PI / 180), 34.39 * (Math.PI / 180), 137.41 * (Math.PI / 180));
+  // camera.rotation.y = Math.PI / 4;
 
   const renderer = new THREE.WebGLRenderer({
     canvas: canvas.value,
@@ -106,27 +134,77 @@ const initThreeScene = () => {
   const mouse = new THREE.Vector2();
 
   // --- LIGHTING (Kunci Neumorphism adalah bayangan lembut) ---
-  const ambientLight = new THREE.AmbientLight(0xffffff, 0.6); // Cahaya dasar
-  scene.add(ambientLight);
+  const ambientLight = new THREE.AmbientLight(0xffffff, 0.8); // Cahaya dasar
+  // scene.add(ambientLight);
 
-  const frontLight = new THREE.DirectionalLight(0xffffff, 1);
+  const frontLight = new THREE.DirectionalLight(0xffffff, 1.2);
   // frontLight.position.set(2, 2, 5); // Cahaya dari depan agak samping
-  frontLight.position.set(0, 10, 10); // Cahaya dari depan agak samping
+  frontLight.position.set(2, 2, 5); // Cahaya dari depan agak samping
   frontLight.intensity = 1.5;
   scene.add(frontLight);
 
   const backLight = new THREE.PointLight(0xffffff, 0.5);
-  backLight.position.set(-5, -5, -2); // Cahaya lemah dari belakang untuk depth
+  backLight.position.set(-5, 0, 5); // Cahaya lemah dari belakang untuk depth
   scene.add(backLight);
+
+  const columns = 5;
+  const spacing = 1.1;
+  gsap.to(gridGroup.rotation, {
+    x: -Math.PI / 4, // Rebah ke belakang (45 derajat)
+    z: Math.PI / 4, // Putar diagonal (45 derajat)
+    scrollTrigger: {
+      trigger: cubeSection.value,
+      start: "top center",
+      end: "top 10%",
+      scrub: 2,
+    },
+  });
 
   skills.forEach((skill, i) => {
     const texture = loader.load(skill.icon);
+    const baseColor = skill.color || 0xffffff;
 
     // 1. Geometri dengan sudut bulat (lebar, tinggi, tebal, segmen, radius)
     // Radius 0.1 di Three.js sudah terlihat seperti 10px-15px di CSS
-    const geometry = new RoundedBoxGeometry(1, 1, 0.4, 4, 0.1);
+    const geometry = new RoundedBoxGeometry(1, 1, 1, 4, 0.1);
+
+    // Buat material polos untuk sisi samping & belakang
+    let sideMaterial;
+
+    if (Array.isArray(skill.color)) {
+      const gradTexture = createGradientTexture(skill.color);
+      sideMaterial = new THREE.MeshStandardMaterial({
+        map: gradTexture,
+        // roughness: 0.3,
+        // metalness: 0.2,
+      });
+    } else {
+      sideMaterial = new THREE.MeshStandardMaterial({
+        color: baseColor,
+        // emissive: baseColor,
+        // roughness: 0.3,
+        // metalness: 0.2,
+        // emissiveIntensity: 0.2,
+      });
+    }
+
+    // Buat material khusus sisi depan (ikon)
+    const frontMaterial = new THREE.MeshStandardMaterial({
+      color: Array.isArray(skill.color) ? skill.color[0] : baseColor,
+      map: texture,
+      // roughness: 0.2,
+      // metalness: 0.1,
+    });
 
     // 2. Material Putih Bersih dengan tekstur ikon di depannya
+    const materials = [
+      sideMaterial, // kanan
+      sideMaterial, // kiri
+      sideMaterial, // atas
+      sideMaterial, // bawah
+      frontMaterial, // DEPAN (ini yang ada ikonnya)
+      sideMaterial, // belakang
+    ];
     const material = new THREE.MeshStandardMaterial({
       color: 0xffffff, // Warna putih dasar
       map: texture, // Ikon tetap muncul di tengah
@@ -134,7 +212,7 @@ const initThreeScene = () => {
       metalness: 0.05,
     });
 
-    const mesh = new THREE.Mesh(geometry, material);
+    const mesh = new THREE.Mesh(geometry, materials);
 
     // POSISI AWAL (Chaos)
     mesh.position.set((Math.random() - 0.5) * 15, (Math.random() - 0.5) * 15, (Math.random() - 0.5) * 10);
@@ -144,12 +222,10 @@ const initThreeScene = () => {
     };
 
     // POSISI TARGET (Grid)
-    const columns = 5;
     const spacingX = 1.2;
     const spacingY = 1.2;
     // const targetX = (i % columns) * spacingX - ((columns - 1) * spacingX) / 2;
     // const targetY = -Math.floor(i / columns) * spacingY + 2;
-    const spacing = 1.1;
 
     const row = Math.floor(i / columns);
     const col = i % columns;
@@ -166,7 +242,7 @@ const initThreeScene = () => {
     });
 
     gsap.to(mesh.rotation, {
-      x: -Math.PI / 6,
+      x: 0,
       y: 0,
       z: 0, // 45 derajat agar ikon tetap tegak di grid yang miring
       scrollTrigger: { trigger: cubeSection.value, start: "top center", end: "top 10%", scrub: 2 },
@@ -174,63 +250,53 @@ const initThreeScene = () => {
 
     scene.add(mesh);
     meshes.push(mesh);
+    gridGroup.add(mesh);
   });
 
   // --- HOVER LOGIC ---
-  // const onMouseMove = (event: MouseEvent) => {
-  //   const rect = canvas.value!.getBoundingClientRect();
-  //   mouse.x = ((event.clientX - rect.left) / width) * 2 - 1;
-  //   mouse.y = -((event.clientY - rect.top) / height) * 2 + 1;
-
-  //   raycaster.setFromCamera(mouse, camera);
-  //   const intersects = raycaster.intersectObjects(meshes);
-
-  //   if (intersects.length > 0) {
-  //     const obj = intersects[0].object as THREE.Mesh;
-  //     document.getElementById("skill-name-display")!.innerText = obj.userData.name;
-  //     document.body.style.cursor = "pointer";
-  //     // Efek Pop-up Neumorphism saat hover
-  //     gsap.to(obj.scale, { x: 0.65, y: 0.65, z: 0.65, duration: 0.3 });
-  //   } else {
-  //     document.getElementById("skill-name-display")!.innerText = "";
-  //     document.body.style.cursor = "default";
-  //     meshes.forEach((m) => gsap.to(m.scale, { x: 1, y: 1, z: 1, duration: 0.3 }));
-  //   }
-  // };
+  let hoveredObj: THREE.Object3D | null = null;
   const onMouseMove = (event: MouseEvent) => {
     const rect = canvas.value!.getBoundingClientRect();
     mouse.x = ((event.clientX - rect.left) / width) * 2 - 1;
     mouse.y = -((event.clientY - rect.top) / height) * 2 + 1;
 
     raycaster.setFromCamera(mouse, camera);
-    const intersects = raycaster.intersectObjects(meshes);
+    const intersects = raycaster.intersectObjects(gridGroup.children, true);
 
     if (intersects.length > 0) {
       const obj = intersects[0].object as THREE.Mesh;
 
-      // Tampilkan nama skill
-      document.getElementById("skill-name-display")!.innerText = obj.userData.name;
-      document.body.style.cursor = "pointer";
+      if (hoveredObj !== obj) {
+        // Jika pindah ke objek baru, kembalikan yang lama dulu
+        if (hoveredObj) resetMesh(hoveredObj);
 
-      // EFEK MENDEM (Press Down) saat Hover
-      gsap.to(obj.position, {
-        z: -0.4, // Mendem ke bawah sumbu Z
-        duration: 0.2,
-        ease: "power2.out",
-      });
+        hoveredObj = obj;
+        document.getElementById("skill-name-display")!.innerText = obj.userData.name;
+        document.body.style.cursor = "pointer";
 
-      // Sedikit membesar atau mengecil (opsional)
-      gsap.to(obj.scale, { x: 0.95, y: 0.95, z: 0.95, duration: 0.2 });
+        // Efek MENEKAN (Mendem)
+        gsap.to(obj.position, {
+          z: -0.5, // Pakai sumbu Z karena grid rebah
+          duration: 0.2,
+          overwrite: true,
+          ease: "power2.out",
+        });
+        gsap.to(obj.scale, { x: 0.9, y: 0.9, z: 0.9, duration: 0.2 });
+      }
     } else {
+      if (hoveredObj) {
+        resetMesh(hoveredObj);
+        hoveredObj = null;
+      }
       document.getElementById("skill-name-display")!.innerText = "";
       document.body.style.cursor = "default";
-
-      // Kembalikan semua mesh ke posisi semula (z: 0)
-      meshes.forEach((m) => {
-        gsap.to(m.position, { z: 0, duration: 0.4, ease: "elastic.out(1, 0.3)" });
-        gsap.to(m.scale, { x: 1, y: 1, z: 1, duration: 0.4 });
-      });
     }
+  };
+
+  // Fungsi Helper untuk mereset posisi mesh
+  const resetMesh = (m: THREE.Object3D) => {
+    gsap.to(m.position, { z: 0, duration: 0.4, ease: "back.out(1.7)" });
+    gsap.to(m.scale, { x: 1, y: 1, z: 1, duration: 0.4 });
   };
 
   window.addEventListener("mousemove", onMouseMove);
@@ -672,9 +738,9 @@ onUnmounted(() => {
       </div>
     </section>
 
-    <section ref="cubeSection" class="relative min-h-screen flex flex-col items-center justify-center bg-[#050505]">
+    <section ref="cubeSection" class="relative min-h-screen flex flex-col items-center justify-center bg-none">
       <div class="absolute z-20 pointer-events-none text-center">
-        <h2 class="text-emerald-500 uppercase tracking-[0.5em] text-xs mb-4 opacity-70">Tech Stack Mastery</h2>
+        <!-- <h2 class="text-emerald-500 uppercase tracking-[0.5em] text-xs mb-4 opacity-70">Tech Stack Mastery</h2> -->
         <div id="skill-name-display" class="text-7xl font-black italic text-white min-h-[100px] drop-shadow-[0_0_15px_rgba(255,255,255,0.3)] uppercase"></div>
       </div>
 
