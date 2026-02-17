@@ -28,7 +28,7 @@ const timelineSection = ref(null);
 const timelineLine = ref(null);
 const timelineItems = ref([]);
 const cubeSection = ref(null);
-const canvas = ref(null);
+const canvas = ref<HTMLCanvasElement | null>(null);
 
 /* ====================== DATA ====================== */
 const experience = [
@@ -39,68 +39,32 @@ const experience = [
 ];
 
 const skills = [
-  { name: "Vue.js", icon: "/icons/three/vue.png", color: "#F7DF1E" },
-  { name: "React.js", icon: "/icons/three/react.png", color: "#23272F" },
-  { name: "JavaScript", icon: "/icons/javascript.png", color: "#F7DF1E" },
-  { name: "TypeScript", icon: "/icons/typescript.png", color: "#007ACC" },
-  { name: "Tailwind", icon: "/icons/three/tailwind.png", color: "#030712" },
-  { name: "Nuxt.js", icon: "/icons/three/nuxt.png", color: ["#010618", "#00DC82"] },
-  { name: "Bootstrap", icon: "/icons/three/bootstrap.png", color: "#8F12FD" },
-  { name: "BigTable", icon: "/icons/Bigtable.png", color: "#D9D9D9" },
-  { name: "BigQuery", icon: "/icons/BigQuery.png", color: "#D9D9D9" },
-  { name: "Vertex AI", icon: "/icons/Vertex AI.png", color: "#D9D9D9" },
-  { name: "Flask", icon: "/icons/three/flask.png", color: "#D9D9D9" },
-  { name: "Git", icon: "/icons/three/git.png", color: "#2A2A2A" },
-  { name: "MySQL", icon: "/icons/three/mysql.png", color: "#D9D9D9" },
-  { name: "PostgreSQL", icon: "/icons/three/postgresql.png", color: "#1E415D" },
-  { name: "Python", icon: "/icons/three/python.png", color: "#1E415D" },
-  { name: "Pinia", icon: "/icons/three/pinia.png", color: ["#56D067", "#A69B35", "#131A27"] },
-  { name: "Socket.io", icon: "/icons/three/socket-io.png", color: "#D9D9D9" },
-  { name: "Express", icon: "/icons/three/express.png", color: "#D9D9D9" },
-  { name: "SSE", icon: "/icons/three/sse.png", color: "#5E17EC" },
+  { name: "HTML 5", icon: "/icons/three2/html.png", color: "#D81A0B", desc: "Manifesting the future with some high-level AI magic." },
+  { name: "CSS", icon: "/icons/three2/css.png", color: "#362584", desc: "Searching through billions of rows faster than I can find my keys." },
+  { name: "JavaScript", icon: "/icons/javascript.png", color: "#F7DF1E", desc: "The OG chaos coordinator. It's not a bug, it's a feature!" },
+  { name: "TypeScript", icon: "/icons/typescript.png", color: "#007ACC", desc: "JavaScript with a suit and tie. Safety first, no more undefined drama." },
+  { name: "Bootstrap", icon: "/icons/three2/bootstrap.png", color: "#8F12FD", desc: "Old but gold. Reliable vibes for when you need a grid ASAP." },
+  { name: "Tailwind", icon: "/icons/three2/tailwind.png", color: "#030712", desc: "Utility classes go brrr! Styling with the ultimate drip, no cap." },
+  { name: "Vue.js", icon: "/icons/three2/vue.png", color: "#031634", desc: "The main character energy for your UI, clean and fast." },
+  { name: "React.js", icon: "/icons/three2/react.png", color: "#23272F", desc: "Hooked on this library, building components like a Lego master." },
+  { name: "Pinia", icon: "/icons/three2/pinia.png", color: "#131A27", desc: "The cute pineapple keeping your state organized and fresh." },
+  { name: "Python", icon: "/icons/three2/python.png", color: "#1E415D", desc: "Write like a human, perform like a beast. Sss-imply powerful." },
+  { name: "Nuxt.js", icon: "/icons/three2/nuxt.png", color: "#010618", desc: "Vue on steroids. SEO friendly, developer happy." },
+  { name: "Flask", icon: "/icons/three2/flask.png", color: "#D9D9D9", desc: "Minimalist backend vibes. Small bottle, big impact." },
+  { name: "Express", icon: "/icons/three2/express.png", color: "#D9D9D9", desc: "Fast, unopinionated, and sleek. The highway for your Node.js." },
+  { name: "Git", icon: "/icons/three2/git.png", color: "#2A2A2A", desc: "Save point for your code. Time traveling made easy (until merge conflicts)." },
+  { name: "Figma", icon: "/icons/three2/figma.png", color: "#23272F", desc: "Manifesting the future with some high-level AI magic." },
+  { name: "PostgreSQL", icon: "/icons/three2/postgresql.png", color: "#1E415D", desc: "The relational goat. Handles your data like a pro." },
+  { name: "MySQL", icon: "/icons/three2/mysql.png", color: "#D9D9D9", desc: "The classic choice. Keeping tables organized since forever." },
+  { name: "BigTable", icon: "/icons/three2/bigtable.png", color: "#D9D9D9", desc: "Massive data? No problem. Wide-column storage for the win." },
+  { name: "Socket.io", icon: "/icons/three2/socket-io.png", color: "#D9D9D9", desc: "Ghosting? Never heard of her. Real-time chatting is the move." },
+  { name: "SSE", icon: "/icons/three2/sse.png", color: "#5E17EC", desc: "One-way street for data, keeping your feed updated without the lag." },
 ];
 const getImageUrl = (name: string) => {
   return new URL(`../assets/images/${name}`, import.meta.url).href;
 };
-const projects = [
-  {
-    id: 1,
-    title: "Project Alpha",
-    bg: "background-image: linear-gradient(to right bottom, #ffffff, #fbfcff, #f3fbff, #e9faff, #dff9fd, #ccf1f2, #bae9e5, #aae1d6, #89d0c0, #67bfaa, #42ae93, #009d7b);",
-    imageName: "yayiha.png",
-    // content2: "/assets/images/yayiha cover.png",
-  },
-  {
-    id: 2,
-    title: "Project Beta",
-    bg: "linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%)",
-  },
-  { id: 3, title: "Project Gamma", bg: "#009d7b" }, // Solid color juga bisa
-  // { id: 4, title: "Project Delta", bg: "url('/images/yayiha cover.jpg') center/cover" },
-];
-
 let ctx: any; // GSAP Context
 /* ====================== THREE.JS LOGIC (Chaos to Order) ====================== */
-
-const createGradientTexture = (colors) => {
-  const canvas = document.createElement("canvas");
-  canvas.width = 256;
-  canvas.height = 256;
-  const ctx = canvas.getContext("2d");
-
-  // Membuat Linear Gradient dari atas ke bawah
-  const gradient = ctx.createLinearGradient(0, 0, 0, 256);
-  colors.forEach((color, index) => {
-    gradient.addColorStop(index / (colors.length - 1), color);
-  });
-
-  ctx.fillStyle = gradient;
-  ctx.fillRect(0, 0, 256, 256);
-
-  const texture = new THREE.CanvasTexture(canvas);
-  texture.needsUpdate = true;
-  return texture;
-};
 const initThreeScene = () => {
   if (!canvas.value || !cubeSection.value) return;
 
@@ -108,13 +72,9 @@ const initThreeScene = () => {
   const gridGroup = new THREE.Group(); // Buat wadah untuk semua kubus
   scene.add(gridGroup);
   const { width, height } = cubeSection.value.getBoundingClientRect();
-  // const camera = new THREE.PerspectiveCamera(75, width / height, 0.1, 1000);
-  const camera = new THREE.PerspectiveCamera(50, width / height, 0.01, 1000);
-  // camera.position.z = 8;
-  // camera.position.set(-4, -2, 7);
-  // camera.position.set(7.52, 7.91, -6.04);
+  const camera = new THREE.PerspectiveCamera(55, width / height, 0.01, 1000);
   camera.position.x = -2;
-  camera.position.y = 5;
+  camera.position.y = 0;
   camera.position.z = 10.044;
   camera.lookAt(0, 0, 0);
   // camera.rotation.set(-121.57 * (Math.PI / 180), 34.39 * (Math.PI / 180), 137.41 * (Math.PI / 180));
@@ -125,8 +85,12 @@ const initThreeScene = () => {
     alpha: true,
     antialias: true,
   });
+  // --- KUNCI WARNA CERAH ---
   renderer.setSize(width, height);
   renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+  // renderer.outputColorSpace = THREE.SRGBColorSpace; // Agar warna tidak kusam
+  // renderer.toneMapping = THREE.ACESFilmicToneMapping;
+  // renderer.toneMappingExposure = 1.2;
 
   const loader = new THREE.TextureLoader();
   const meshes: THREE.Mesh[] = [];
@@ -135,33 +99,53 @@ const initThreeScene = () => {
 
   // --- LIGHTING (Kunci Neumorphism adalah bayangan lembut) ---
   const ambientLight = new THREE.AmbientLight(0xffffff, 0.8); // Cahaya dasar
-  // scene.add(ambientLight);
+  scene.add(ambientLight);
 
-  const frontLight = new THREE.DirectionalLight(0xffffff, 1.2);
+  const frontLight = new THREE.DirectionalLight(0xffffff, 0.8);
   // frontLight.position.set(2, 2, 5); // Cahaya dari depan agak samping
-  frontLight.position.set(2, 2, 5); // Cahaya dari depan agak samping
+  frontLight.position.set(5, 10, 7); // Cahaya dari depan agak samping
   frontLight.intensity = 1.5;
   scene.add(frontLight);
 
   const backLight = new THREE.PointLight(0xffffff, 0.5);
-  backLight.position.set(-5, 0, 5); // Cahaya lemah dari belakang untuk depth
+  backLight.position.set(-5, -5, -5); // Cahaya lemah dari belakang untuk depth
   scene.add(backLight);
 
   const columns = 5;
   const spacing = 1.1;
+
+  // --- MEMBUAT WADAH (TRAY) ---
+  const trayWidth = columns * spacing + 1; // Sesuaikan ukuran
+  const trayHeight = Math.ceil(skills.length / columns) * spacing + 1;
+
+  // Gunakan RoundedBoxGeometry juga agar sudutnya serasi dengan kubus
+  const trayGeometry = new RoundedBoxGeometry(trayWidth, trayHeight, 0.5, 4, 0.2);
+  const trayMaterial = new THREE.MeshStandardMaterial({
+    color: 0x0a0a0a, // Warna wadah (gelap premium)
+    roughness: 0.4,
+    metalness: 0.1,
+  });
+
+  const tray = new THREE.Mesh(trayGeometry, trayMaterial);
+
+  // Posisikan tepat di belakang kubus (z sedikit negatif agar tidak beradu/z-fighting)
+  tray.position.set(0, 0, -0.6);
+
   gsap.to(gridGroup.rotation, {
     x: -Math.PI / 4, // Rebah ke belakang (45 derajat)
     z: Math.PI / 4, // Putar diagonal (45 derajat)
     scrollTrigger: {
       trigger: cubeSection.value,
       start: "top center",
-      end: "top 10%",
+      end: "top 5%",
       scrub: 2,
     },
   });
+  gridGroup.add(tray);
 
   skills.forEach((skill, i) => {
     const texture = loader.load(skill.icon);
+    texture.colorSpace = THREE.SRGBColorSpace;
     const baseColor = skill.color || 0xffffff;
 
     // 1. Geometri dengan sudut bulat (lebar, tinggi, tebal, segmen, radius)
@@ -169,31 +153,18 @@ const initThreeScene = () => {
     const geometry = new RoundedBoxGeometry(1, 1, 1, 4, 0.1);
 
     // Buat material polos untuk sisi samping & belakang
-    let sideMaterial;
-
-    if (Array.isArray(skill.color)) {
-      const gradTexture = createGradientTexture(skill.color);
-      sideMaterial = new THREE.MeshStandardMaterial({
-        map: gradTexture,
-        // roughness: 0.3,
-        // metalness: 0.2,
-      });
-    } else {
-      sideMaterial = new THREE.MeshStandardMaterial({
-        color: baseColor,
-        // emissive: baseColor,
-        // roughness: 0.3,
-        // metalness: 0.2,
-        // emissiveIntensity: 0.2,
-      });
-    }
+    const sideMaterial = new THREE.MeshStandardMaterial({
+      color: baseColor,
+      roughness: 0.1, // Lebih licin agar lebih cerah
+      metalness: 0.0, // Hilangkan metalness agar tidak memantulkan warna hitam lingkungan
+    });
 
     // Buat material khusus sisi depan (ikon)
     const frontMaterial = new THREE.MeshStandardMaterial({
-      color: Array.isArray(skill.color) ? skill.color[0] : baseColor,
+      color: 0xb6b6b6, // Gunakan putih agar warna texture asli keluar
       map: texture,
-      // roughness: 0.2,
-      // metalness: 0.1,
+      roughness: 0,
+      metalness: 0.3,
     });
 
     // 2. Material Putih Bersih dengan tekstur ikon di depannya
@@ -215,17 +186,13 @@ const initThreeScene = () => {
     const mesh = new THREE.Mesh(geometry, materials);
 
     // POSISI AWAL (Chaos)
-    mesh.position.set((Math.random() - 0.5) * 15, (Math.random() - 0.5) * 15, (Math.random() - 0.5) * 10);
+    mesh.position.set((Math.random() - 0.5) * 19, (Math.random() - 0.5) * 19, (Math.random() - 0.5) * 10);
     mesh.rotation.set(Math.random(), Math.random(), 0);
     mesh.userData = {
       name: skill.name,
     };
 
     // POSISI TARGET (Grid)
-    const spacingX = 1.2;
-    const spacingY = 1.2;
-    // const targetX = (i % columns) * spacingX - ((columns - 1) * spacingX) / 2;
-    // const targetY = -Math.floor(i / columns) * spacingY + 2;
 
     const row = Math.floor(i / columns);
     const col = i % columns;
@@ -238,14 +205,28 @@ const initThreeScene = () => {
       x: targetX,
       y: targetY,
       z: 0,
-      scrollTrigger: { trigger: cubeSection.value, start: "top center", end: "top 10%", scrub: 2 },
+      scrollTrigger: { trigger: cubeSection.value, start: "top center", end: "top 5%", scrub: 2 },
     });
 
     gsap.to(mesh.rotation, {
-      x: 0,
-      y: 0,
+      x: Math.PI * 4,
+      y: Math.PI * 2,
       z: 0, // 45 derajat agar ikon tetap tegak di grid yang miring
-      scrollTrigger: { trigger: cubeSection.value, start: "top center", end: "top 10%", scrub: 2 },
+      scrollTrigger: { trigger: cubeSection.value, start: "top center", end: "top 5%", scrub: 2 },
+    });
+
+    // Set tray transparan di awal
+    trayMaterial.transparent = true;
+    trayMaterial.opacity = 0;
+
+    gsap.to(trayMaterial, {
+      opacity: 1,
+      scrollTrigger: {
+        trigger: cubeSection.value,
+        start: "top 20%", // Mulai muncul saat section sudah lewat sedikit
+        end: "top 5%", // Full muncul mendekati kubus mendarat
+        scrub: true,
+      },
     });
 
     scene.add(mesh);
@@ -253,63 +234,131 @@ const initThreeScene = () => {
     gridGroup.add(mesh);
   });
 
-  // --- HOVER LOGIC ---
-  let hoveredObj: THREE.Object3D | null = null;
-  const onMouseMove = (event: MouseEvent) => {
-    const rect = canvas.value!.getBoundingClientRect();
-    mouse.x = ((event.clientX - rect.left) / width) * 2 - 1;
-    mouse.y = -((event.clientY - rect.top) / height) * 2 + 1;
+  // --- HELPER FUNCTIONS (Di luar onMouseMove) ---
 
-    raycaster.setFromCamera(mouse, camera);
-    const intersects = raycaster.intersectObjects(gridGroup.children, true);
+  const resetCube = (m: THREE.Object3D) => {
+    gsap.to(m.position, {
+      z: 0,
+      duration: 0.4,
+      ease: "power2.inOut",
+    });
+    gsap.to(m.scale, { x: 1, y: 1, z: 1, duration: 0.4 });
+  };
 
-    if (intersects.length > 0) {
-      const obj = intersects[0].object as THREE.Mesh;
+  const resetTextDisplay = () => {
+    const displayTitle = document.getElementById("skill-name-display");
+    const displayDesc = document.getElementById("skill-desc-display");
 
-      if (hoveredObj !== obj) {
-        // Jika pindah ke objek baru, kembalikan yang lama dulu
-        if (hoveredObj) resetMesh(hoveredObj);
-
-        hoveredObj = obj;
-        document.getElementById("skill-name-display")!.innerText = obj.userData.name;
-        document.body.style.cursor = "pointer";
-
-        // Efek MENEKAN (Mendem)
-        gsap.to(obj.position, {
-          z: -0.5, // Pakai sumbu Z karena grid rebah
-          duration: 0.2,
-          overwrite: true,
-          ease: "power2.out",
-        });
-        gsap.to(obj.scale, { x: 0.9, y: 0.9, z: 0.9, duration: 0.2 });
-      }
-    } else {
-      if (hoveredObj) {
-        resetMesh(hoveredObj);
-        hoveredObj = null;
-      }
-      document.getElementById("skill-name-display")!.innerText = "";
-      document.body.style.cursor = "default";
+    if (displayTitle || displayDesc) {
+      gsap.killTweensOf([displayTitle, displayDesc]); // Hentikan animasi typewriter yang sedang jalan
+      gsap.to([displayTitle, displayDesc], {
+        opacity: 0,
+        translateZ: 0,
+        duration: 0.3,
+        ease: "power2.inOut",
+        onComplete: () => {
+          if (displayTitle) displayTitle.innerText = "";
+          if (displayDesc) displayDesc.innerText = "";
+        },
+      });
     }
   };
 
-  // Fungsi Helper untuk mereset posisi mesh
-  const resetMesh = (m: THREE.Object3D) => {
-    gsap.to(m.position, { z: 0, duration: 0.4, ease: "back.out(1.7)" });
-    gsap.to(m.scale, { x: 1, y: 1, z: 1, duration: 0.4 });
+  // --- HOVER LOGIC ---
+  let hoveredObj: THREE.Object3D | null = null;
+  // REPLACE seluruh onMouseMove dengan ini:
+  const onMouseMove = (event: MouseEvent) => {
+    if (!canvas.value) return;
+
+    // ✅ FIX 1: Selalu ambil rect FRESH setiap move (bukan cached)
+    const rect = (canvas.value as HTMLCanvasElement).getBoundingClientRect();
+
+    // ✅ FIX 2: Hitung mouse relatif terhadap canvas di viewport SAAT INI
+    mouse.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
+    mouse.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
+
+    raycaster.setFromCamera(mouse, camera);
+    const intersects = raycaster.intersectObjects(meshes, false);
+
+    const displayTitle = document.getElementById("skill-name-display");
+    const displayDesc = document.getElementById("skill-desc-display");
+
+    if (intersects.length > 0) {
+      const obj = intersects[0].object as THREE.Mesh;
+      const skillData = skills.find((s) => s.name === obj.userData.name);
+
+      if (hoveredObj !== obj && skillData) {
+        if (hoveredObj) resetCube(hoveredObj);
+
+        hoveredObj = obj;
+        document.body.style.cursor = "pointer";
+
+        if (displayTitle && displayDesc) {
+          gsap.killTweensOf([displayTitle, displayDesc]);
+
+          displayTitle.innerText = skillData.name;
+          gsap.fromTo(displayTitle, { opacity: 0 }, { opacity: 1, scale: 1, duration: 0.4, ease: "power2.out" });
+
+          displayDesc.innerText = skillData.desc;
+          gsap.fromTo(displayDesc, { opacity: 0, y: 0, scale: 0.98 }, { opacity: 1, y: 0, scale: 1, duration: 0.5, ease: "power2.out" });
+        }
+
+        gsap.to(obj.position, { z: -0.5, duration: 0.2, ease: "power2.inOut", overwrite: "auto" });
+      }
+    } else {
+      if (hoveredObj) {
+        resetCube(hoveredObj);
+        resetTextDisplay();
+        hoveredObj = null;
+        document.body.style.cursor = "default";
+      }
+    }
   };
 
   window.addEventListener("mousemove", onMouseMove);
 
   const animate = () => {
-    // meshes.forEach((m, i) => {
-    //   m.rotation.y += 0.005;
-    //   m.position.y += Math.sin(Date.now() * 0.001 + i) * 0.003;
-    // });
     renderer.render(scene, camera);
     requestAnimationFrame(animate);
   };
   animate();
+
+  // ✅ FIX 3: Handle resize agar canvas size selalu sinkron
+  const handleResize = () => {
+    if (!canvas.value || !cubeSection.value) return;
+    const { width, height } = cubeSection.value.getBoundingClientRect();
+    camera.aspect = width / height;
+    camera.updateProjectionMatrix();
+    renderer.setSize(width, height);
+  };
+
+  window.addEventListener("resize", handleResize);
+};
+
+const myEmail = "startrail1stacc@email.com";
+
+const openGmailCompose = () => {
+  const subject = encodeURIComponent("Project Inquiry from Portfolio");
+
+  const body = encodeURIComponent(
+    `Hi Zen,
+
+I’m interested in working with you.
+
+Here are the details of my project:
+
+- Project type:
+- Budget:
+- Timeline:
+
+Looking forward to your reply.
+
+Best regards,`,
+  );
+
+  const gmailUrl = `https://mail.google.com/mail/?view=cm&fs=1` + `&to=${myEmail}` + `&su=${subject}` + `&body=${body}`;
+
+  window.open(gmailUrl, "_blank");
 };
 
 /* ====================== LIFECYCLE ====================== */
@@ -391,11 +440,16 @@ onMounted(() => {
 
     // 4. ThreeJS
     initThreeScene();
+    setTimeout(() => {
+      ScrollTrigger.refresh();
+    }, 500);
   });
 });
 
 onUnmounted(() => {
   if (ctx) ctx.revert(); // Hapus semua animasi & trigger
+  window.removeEventListener("mousemove", onMouseMove);
+  window.removeEventListener("resize", handleResize);
 });
 </script>
 
@@ -738,15 +792,26 @@ onUnmounted(() => {
       </div>
     </section>
 
-    <section ref="cubeSection" class="relative min-h-screen flex flex-col items-center justify-center bg-none">
-      <div class="absolute z-20 pointer-events-none text-center">
-        <!-- <h2 class="text-emerald-500 uppercase tracking-[0.5em] text-xs mb-4 opacity-70">Tech Stack Mastery</h2> -->
-        <div id="skill-name-display" class="text-7xl font-black italic text-white min-h-[100px] drop-shadow-[0_0_15px_rgba(255,255,255,0.3)] uppercase"></div>
+    <section ref="cubeSection" class="relative h-screen flex flex-col items-center justify-center cube-section">
+      <h2 class="absolute top-16 text-4xl font-black text-white mb-4 opacity-70">Tech Stack</h2>
+      <div class="absolute z-50 pointer-events-none text-center wrapper-skill-name">
+        <!-- <div id="skill-name-display" class="text-7xl font-black text-white min-h-[100px] drop-shadow-[0_0_15px_rgba(255,255,255,0.3)] uppercase"></div> -->
+        <div class="skill-plane">
+          <div id="skill-name-display" class="text-start text-6xl font-black text-white drop-shadow-[0_0_15px_rgba(255,255,255,0.3)] uppercase"></div>
+          <div id="skill-desc-display" class="text-2xl text-start font-medium text-white mt-4 max-w-md italic opacity-0"></div>
+        </div>
       </div>
 
       <canvas ref="canvas" class="w-full h-full"></canvas>
 
-      <div class="absolute inset-0 pointer-events-none bg-[radial-gradient(circle_at_center,transparent_0%,#050505_80%)]"></div>
+      <!-- <div class="absolute inset-0 pointer-events-none bg-[radial-gradient(circle_at_center,transparent_0%,#050505_80%)]"></div> -->
+    </section>
+    <section class="min-h-screen bg-none">
+      <div>
+        <h2>Interested in working with me?</h2>
+
+        <button @click="openGmailCompose">Send via Gmail</button>
+      </div>
     </section>
   </main>
 </template>
@@ -755,6 +820,11 @@ onUnmounted(() => {
 /* Reset & Base */
 .hero-section {
   background-image: linear-gradient(to right bottom, #000000, #010000, #030001, #040001, #060001, #090001, #0c0002, #0e0002, #120002, #150003, #170103, #1a0103);
+}
+.cube-section {
+  background-image: linear-gradient(to right bottom, #000000, #010000, #030001, #040001, #060001, #090001, #0c0002, #0e0002, #120002, #150003, #170103, #1a0103);
+  position: relative;
+  overflow: hidden;
 }
 
 /* Typewriter Cursor */
@@ -982,11 +1052,38 @@ onUnmounted(() => {
   background: white !important;
 }
 /* Update font dan gaya untuk nama skill yang muncul */
-#skill-name-display {
-  font-family: "Inter", sans-serif; /* Atau font andalanmu */
-  transition: all 0.3s ease-in-out;
+
+.wrapper-skill-name {
+  height: 180px;
+  position: absolute;
+  pointer-events: none !important;
+  user-select: none;
+  z-index: 50;
+
+  /* Posisi awal (Sesuaikan top/left jika diperlukan) */
+  top: 25%;
+  left: 20%;
 }
 
+.skill-plane {
+  transform: rotateX(45deg) rotateZ(-37deg);
+  transform-style: preserve-3d;
+}
+
+#skill-name-display {
+  will-change: transform, opacity;
+  /* Layering shadow buat efek ketebalan balok */
+  text-shadow:
+    0px 1px 0px #ccc,
+    0px 2px 0px #bbb,
+    0px 3px 0px #aaa,
+    0px 4px 0px #999,
+    0px 8px 15px rgba(0, 0, 0, 0.5);
+}
+#skill-desc-display {
+  transform: rotateX(15deg) rotateZ(-2deg);
+  transform-style: preserve-3d;
+}
 /* Mempercantik tampilan tech-icon di project card */
 .tech-icon {
   @apply opacity-0 translate-y-10 transition-all duration-500 ease-out;
