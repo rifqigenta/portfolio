@@ -32,9 +32,58 @@ const canvas = ref<HTMLCanvasElement | null>(null);
 
 /* ====================== DATA ====================== */
 const experience = [
-  { id: 1, name: "Fullstack Programmer", company: "PT. Horus Technology", desc: "Developed and maintained ERP systems using Vue.js, Python and PostgreSQL.", icon: "pi pi-briefcase" },
-  { id: 2, name: "Web development Mentee", company: "Infinite Learning", desc: "Hands-on experience in UI/UX and Fullstack implementation.", icon: "pi pi-graduation-cap" },
-  { id: 3, name: "Practicum Lab Assistant", company: "Amikom University", desc: "Assisted students during algorithm and programming sessions.", icon: "pi pi-briefcase" },
+  {
+    id: 1,
+    name: "Fullstack Programmer",
+    company: "PT. Horus Technology",
+    desc: "Developed ERP system such as creating application interface, integrated it with backend, building basis data, REST API, etc. Maintained the ERP system.",
+    icon: "pi pi-briefcase",
+    skills: [
+      "/icons/three2/html.png",
+      "icons/three2/css.png",
+      "icons/three2/javascript.png",
+      "icons/three2/tailwind.png",
+      "icons/three2/vue.png",
+      "icons/three2/pinia.png",
+      "icons/three2/python.png",
+      "icons/three2/flask.png",
+      "icons/three2/bigtable.png",
+      "icons/three2/bigquery.png",
+      "icons/three2/vertex.png",
+      "icons/three2/git.png",
+      "icons/three2/bootstrap.png",
+      "icons/three2/postgresql.png",
+      "icons/three2/mysql.png",
+      "icons/three2/sse.png",
+      "icons/three2/socket-io.png",
+    ],
+  },
+  {
+    id: 2,
+    name: "Web development Mentee",
+    company: "Infinite Learning",
+    desc: "Hands-on experience in UI/UX and Fullstack implementation based on 3 separated projects. such as, only UI/UX, frontend only, and fullstack web development ",
+    icon: "pi pi-graduation-cap",
+    skills: [
+      "/icons/three2/html.png",
+      "icons/three2/css.png",
+      "icons/three2/javascript.png",
+      "icons/three2/tailwind.png",
+      "icons/three2/bootstrap.png",
+      "icons/three2/react.png",
+      "icons/three2/express.png",
+      "icons/three2/figma.png",
+      "icons/three2/mysql.png",
+    ],
+  },
+  {
+    id: 3,
+    name: "Practicum Lab Assistant",
+    company: "Amikom University",
+    desc: "Assisted / teaching students during algorithm and programming sessions. Grading the student assesment.",
+    icon: "pi pi-briefcase",
+    skills: ["/icons/three2/cpp.png"],
+  },
   { id: 4, name: "GPA : 3.82/4.00", company: "Amikom University", desc: "Academic Excellence.", icon: "pi pi-graduation-cap" },
 ];
 
@@ -129,7 +178,14 @@ const initThreeScene = () => {
   const tray = new THREE.Mesh(trayGeometry, trayMaterial);
 
   // Posisikan tepat di belakang kubus (z sedikit negatif agar tidak beradu/z-fighting)
-  tray.position.set(0, 0, -0.6);
+  // tray.position.set(0, 0, -0.6);
+  // POSISI AWAL: kiri atas + agak jauh
+  tray.position.set(-trayWidth * 1.5, trayHeight * 1.5, -3);
+
+  // Rotasi awal (menghadap agak jatuh)
+  tray.rotation.x = Math.PI / 1.5;
+  tray.rotation.y = -Math.PI / 4;
+  tray.rotation.z = Math.PI / 8;
 
   gsap.to(gridGroup.rotation, {
     x: -Math.PI / 4, // Rebah ke belakang (45 derajat)
@@ -142,6 +198,58 @@ const initThreeScene = () => {
     },
   });
   gridGroup.add(tray);
+  const trayEnterTimeline = gsap.timeline({
+    scrollTrigger: {
+      trigger: cubeSection.value,
+      start: "top center",
+      end: "top 10%",
+      scrub: 2,
+    },
+  });
+
+  trayEnterTimeline.to(tray.position, {
+    x: 0,
+    y: 0,
+    z: -0.6,
+    ease: "power3.out",
+  });
+
+  trayEnterTimeline.to(
+    tray.rotation,
+    {
+      x: 0,
+      y: 0,
+      z: 0,
+      ease: "power3.out",
+    },
+    0, // jalan barengan
+  );
+  const trayExitTimeline = gsap.timeline({
+    scrollTrigger: {
+      trigger: cubeSection.value,
+      start: "top -50%", // saat sudah tertutup 50%
+      end: "top -120%",
+      scrub: 2,
+    },
+  });
+
+  trayExitTimeline.to(tray.position, {
+    x: trayWidth * 1.5, // ke kanan atas
+    y: trayHeight * 1.5,
+    z: -3,
+    ease: "power3.in",
+  });
+
+  trayExitTimeline.to(
+    tray.rotation,
+    {
+      x: -Math.PI / 1.5,
+      y: Math.PI / 4,
+      z: -Math.PI / 8,
+      ease: "power3.in",
+    },
+    0,
+  );
 
   skills.forEach((skill, i) => {
     const texture = loader.load(skill.icon);
@@ -186,10 +294,30 @@ const initThreeScene = () => {
     const mesh = new THREE.Mesh(geometry, materials);
 
     // POSISI AWAL (Chaos)
-    mesh.position.set((Math.random() - 0.5) * 19, (Math.random() - 0.5) * 19, (Math.random() - 0.5) * 10);
-    mesh.rotation.set(Math.random(), Math.random(), 0);
+    // mesh.position.set((Math.random() - 0.5) * 19, (Math.random() - 0.5) * 19, (Math.random() - 0.5) * 10);
+    // mesh.rotation.set(Math.random(), Math.random(), 0);
+    // mesh.userData = {
+    //   name: skill.name,
+    // };
+    const chaosPosition = {
+      x: (Math.random() - 0.5) * 19,
+      y: (Math.random() - 0.5) * 19,
+      z: (Math.random() - 0.5) * 10,
+    };
+
+    const chaosRotation = {
+      x: Math.random() * Math.PI * 2,
+      y: Math.random() * Math.PI * 2,
+      z: Math.random() * Math.PI * 2,
+    };
+
+    mesh.position.set(chaosPosition.x, chaosPosition.y, chaosPosition.z);
+    mesh.rotation.set(chaosRotation.x, chaosRotation.y, chaosRotation.z);
+
     mesh.userData = {
       name: skill.name,
+      chaosPosition,
+      chaosRotation,
     };
 
     // POSISI TARGET (Grid)
@@ -201,18 +329,27 @@ const initThreeScene = () => {
     const targetX = (col - (columns - 1) / 2) * spacing;
     const targetY = -(row - 1.5) * spacing;
 
-    gsap.to(mesh.position, {
-      x: targetX,
-      y: targetY,
-      z: 0,
-      scrollTrigger: { trigger: cubeSection.value, start: "top center", end: "top 5%", scrub: 2 },
-    });
+    // gsap.to(mesh.position, {
+    //   x: targetX,
+    //   y: targetY,
+    //   z: 0,
+    //   scrollTrigger: { trigger: cubeSection.value, start: "top center", end: "top 5%", scrub: 2 },
+    // });
 
-    gsap.to(mesh.rotation, {
-      x: Math.PI * 4,
-      y: Math.PI * 2,
-      z: 0, // 45 derajat agar ikon tetap tegak di grid yang miring
-      scrollTrigger: { trigger: cubeSection.value, start: "top center", end: "top 5%", scrub: 2 },
+    // gsap.to(mesh.rotation, {
+    //   x: Math.PI * 4,
+    //   y: Math.PI * 2,
+    //   z: 0, // 45 derajat agar ikon tetap tegak di grid yang miring
+    //   scrollTrigger: { trigger: cubeSection.value, start: "top center", end: "top 5%", scrub: 2 },
+    // });
+    ScrollTrigger.create({
+      trigger: cubeSection.value,
+      start: "top center",
+      end: "bottom center",
+      onEnter: () => animateToGrid(),
+      onEnterBack: () => animateToGrid(),
+      onLeave: () => animateToChaos(),
+      onLeaveBack: () => animateToChaos(),
     });
 
     // Set tray transparan di awal
@@ -233,6 +370,56 @@ const initThreeScene = () => {
     meshes.push(mesh);
     gridGroup.add(mesh);
   });
+
+  const animateToGrid = () => {
+    meshes.forEach((mesh, i) => {
+      const row = Math.floor(i / columns);
+      const col = i % columns;
+
+      const targetX = (col - (columns - 1) / 2) * spacing;
+      const targetY = -(row - 1.5) * spacing;
+
+      gsap.to(mesh.position, {
+        x: targetX,
+        y: targetY,
+        z: 0,
+        duration: 1.2,
+        ease: "power3.inOut",
+      });
+
+      gsap.to(mesh.rotation, {
+        x: Math.PI * 4,
+        y: Math.PI * 2,
+        z: 0,
+        duration: 1.2,
+        ease: "power3.inOut",
+      });
+    });
+
+    gsap.to(trayMaterial, { opacity: 1, duration: 0.8 });
+  };
+  const animateToChaos = () => {
+    meshes.forEach((mesh) => {
+      const randomX = (Math.random() - 0.5) * 20;
+      const randomY = (Math.random() - 0.5) * 20;
+      const randomZ = (Math.random() - 0.5) * 10;
+
+      gsap.to(mesh.position, {
+        x: randomX,
+        y: randomY,
+        z: randomZ,
+        duration: 1.4,
+        ease: "power3.inOut",
+      });
+
+      gsap.to(mesh.rotation, {
+        x: mesh.rotation.x + Math.PI * 4,
+        y: mesh.rotation.y + Math.PI * 4,
+        duration: 1.4,
+        ease: "power3.inOut",
+      });
+    });
+  };
 
   // --- HELPER FUNCTIONS (Di luar onMouseMove) ---
 
@@ -517,8 +704,15 @@ onUnmounted(() => {
               >
               <template #subtitle>{{ item.company }}</template>
               <template #content
-                ><p class="text-sm">{{ item.desc }}</p></template
+                ><p class="text-sm my-2">{{ item.desc }}</p></template
               >
+              <template #footer>
+                <div v-if="item.skills" class="grid grid-cols-7 gap-2">
+                  <span v-for="(skill, i) in item.skills" :key="i">
+                    <img :src="skill" alt="" width="34" />
+                  </span>
+                </div>
+              </template>
             </Card>
           </div>
           <div class="timeline-dot-center shadow-md"><i :class="item.icon"></i></div>
@@ -792,8 +986,8 @@ onUnmounted(() => {
       </div>
     </section>
 
-    <section ref="cubeSection" class="relative h-screen flex flex-col items-center justify-center cube-section">
-      <h2 class="absolute top-16 text-4xl font-black text-white mb-4 opacity-70">Tech Stack</h2>
+    <section ref="cubeSection" class="relative h-screen flex flex-col items-center justify-center bg-none">
+      <h2 class="absolute top-16 text-4xl font-black text-white mb-4">Tech Stack</h2>
       <div class="absolute z-50 pointer-events-none text-center wrapper-skill-name">
         <!-- <div id="skill-name-display" class="text-7xl font-black text-white min-h-[100px] drop-shadow-[0_0_15px_rgba(255,255,255,0.3)] uppercase"></div> -->
         <div class="skill-plane">
@@ -806,11 +1000,11 @@ onUnmounted(() => {
 
       <!-- <div class="absolute inset-0 pointer-events-none bg-[radial-gradient(circle_at_center,transparent_0%,#050505_80%)]"></div> -->
     </section>
-    <section class="min-h-screen bg-none">
-      <div>
-        <h2>Interested in working with me?</h2>
+    <section class="min-h-screen cube-section flex justify-center items-center w-full">
+      <div class="flex flex-col gap-12">
+        <h2 class="text-4xl text-center text-white font-black opacity-70">Interested in working with me?</h2>
 
-        <button @click="openGmailCompose">Send via Gmail</button>
+        <button @click="openGmailCompose" class="border border-white mx-auto text-2xl px-6 py-4">Get in Touch</button>
       </div>
     </section>
   </main>
