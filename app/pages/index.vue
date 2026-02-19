@@ -4,6 +4,7 @@ import { ScrollTrigger } from "gsap/ScrollTrigger";
 import * as THREE from "three";
 import { TextPlugin } from "gsap/TextPlugin";
 import { RoundedBoxGeometry } from "three-stdlib";
+import SplashCursor from "~/components/ui/SplashCursor.vue";
 
 // Matikan SSR karena Three.js butuh akses langsung ke DOM/Window
 definePageMeta({
@@ -17,6 +18,7 @@ gsap.registerPlugin(ScrollTrigger, TextPlugin);
 const name = "Rifqi Genta B.";
 
 /* ====================== REFS ====================== */
+const heroSection = ref(null);
 const heroText = ref(null);
 const heroImage = ref(null);
 const shapeSquare = ref(null);
@@ -112,6 +114,14 @@ const skills = [
 const getImageUrl = (name: string) => {
   return new URL(`../assets/images/${name}`, import.meta.url).href;
 };
+const mouseParallax = {
+  x: 0,
+  y: 0,
+};
+
+const parallaxStrength = 1; // bisa kamu tweak
+const parallaxSmooth = 0.06; // makin kecil makin halus
+
 let ctx: any; // GSAP Context
 /* ====================== THREE.JS LOGIC (Chaos to Order) ====================== */
 const initThreeScene = () => {
@@ -227,21 +237,23 @@ const initThreeScene = () => {
   const trayExitTimeline = gsap.timeline({
     scrollTrigger: {
       trigger: cubeSection.value,
-      start: "top -50%", // saat sudah tertutup 50%
-      end: "top -120%",
+      start: "top -10%",
+      end: "top -20%",
       scrub: 2,
     },
   });
 
-  trayExitTimeline.to(tray.position, {
-    x: trayWidth * 1.5, // ke kanan atas
+  // Geser seluruh group
+  trayExitTimeline.to(gridGroup.position, {
+    x: trayWidth * 1.5,
     y: trayHeight * 1.5,
     z: -3,
     ease: "power3.in",
   });
 
+  // Putar seluruh group
   trayExitTimeline.to(
-    tray.rotation,
+    gridGroup.rotation,
     {
       x: -Math.PI / 1.5,
       y: Math.PI / 4,
@@ -284,21 +296,10 @@ const initThreeScene = () => {
       frontMaterial, // DEPAN (ini yang ada ikonnya)
       sideMaterial, // belakang
     ];
-    const material = new THREE.MeshStandardMaterial({
-      color: 0xffffff, // Warna putih dasar
-      map: texture, // Ikon tetap muncul di tengah
-      roughness: 0.15, // Agar ada sedikit kilauan halus
-      metalness: 0.05,
-    });
 
     const mesh = new THREE.Mesh(geometry, materials);
 
     // POSISI AWAL (Chaos)
-    // mesh.position.set((Math.random() - 0.5) * 19, (Math.random() - 0.5) * 19, (Math.random() - 0.5) * 10);
-    // mesh.rotation.set(Math.random(), Math.random(), 0);
-    // mesh.userData = {
-    //   name: skill.name,
-    // };
     const chaosPosition = {
       x: (Math.random() - 0.5) * 19,
       y: (Math.random() - 0.5) * 19,
@@ -320,51 +321,9 @@ const initThreeScene = () => {
       chaosRotation,
     };
 
-    // POSISI TARGET (Grid)
-
-    const row = Math.floor(i / columns);
-    const col = i % columns;
-
-    // Posisi Grid Standar (Horizontal-Vertikal dulu)
-    const targetX = (col - (columns - 1) / 2) * spacing;
-    const targetY = -(row - 1.5) * spacing;
-
-    // gsap.to(mesh.position, {
-    //   x: targetX,
-    //   y: targetY,
-    //   z: 0,
-    //   scrollTrigger: { trigger: cubeSection.value, start: "top center", end: "top 5%", scrub: 2 },
-    // });
-
-    // gsap.to(mesh.rotation, {
-    //   x: Math.PI * 4,
-    //   y: Math.PI * 2,
-    //   z: 0, // 45 derajat agar ikon tetap tegak di grid yang miring
-    //   scrollTrigger: { trigger: cubeSection.value, start: "top center", end: "top 5%", scrub: 2 },
-    // });
-    ScrollTrigger.create({
-      trigger: cubeSection.value,
-      start: "top center",
-      end: "bottom center",
-      onEnter: () => animateToGrid(),
-      onEnterBack: () => animateToGrid(),
-      onLeave: () => animateToChaos(),
-      onLeaveBack: () => animateToChaos(),
-    });
-
     // Set tray transparan di awal
     trayMaterial.transparent = true;
     trayMaterial.opacity = 0;
-
-    gsap.to(trayMaterial, {
-      opacity: 1,
-      scrollTrigger: {
-        trigger: cubeSection.value,
-        start: "top 20%", // Mulai muncul saat section sudah lewat sedikit
-        end: "top 5%", // Full muncul mendekati kubus mendarat
-        scrub: true,
-      },
-    });
 
     scene.add(mesh);
     meshes.push(mesh);
@@ -383,7 +342,7 @@ const initThreeScene = () => {
         x: targetX,
         y: targetY,
         z: 0,
-        duration: 1.2,
+        duration: 2.2,
         ease: "power3.inOut",
       });
 
@@ -391,12 +350,12 @@ const initThreeScene = () => {
         x: Math.PI * 4,
         y: Math.PI * 2,
         z: 0,
-        duration: 1.2,
+        duration: 2.2,
         ease: "power3.inOut",
       });
     });
 
-    gsap.to(trayMaterial, { opacity: 1, duration: 0.8 });
+    gsap.to(trayMaterial, { opacity: 1, duration: 0.5 });
   };
   const animateToChaos = () => {
     meshes.forEach((mesh) => {
@@ -420,6 +379,43 @@ const initThreeScene = () => {
       });
     });
   };
+  const animateToChaosEnd = () => {
+    meshes.forEach((mesh) => {
+      const { chaosPosition, chaosRotation } = mesh.userData;
+
+      gsap.to(mesh.position, {
+        x: chaosPosition.x,
+        y: chaosPosition.y,
+        z: chaosPosition.z,
+        duration: 1.4,
+        ease: "power3.inOut",
+        overwrite: "auto",
+      });
+
+      gsap.to(mesh.rotation, {
+        x: chaosRotation.x,
+        y: chaosRotation.y,
+        z: chaosRotation.z,
+        duration: 1.4,
+        ease: "power3.inOut",
+        overwrite: "auto",
+      });
+    });
+
+    gsap.to(trayMaterial, {
+      opacity: 0,
+      duration: 0.6,
+    });
+  };
+  ScrollTrigger.create({
+    trigger: cubeSection.value,
+    start: "top center",
+    end: "bottom center",
+    onEnter: () => animateToGrid(),
+    onEnterBack: () => animateToGrid(),
+    onLeave: () => animateToGrid(),
+    onLeaveBack: () => animateToChaos(),
+  });
 
   // --- HELPER FUNCTIONS (Di luar onMouseMove) ---
 
@@ -464,6 +460,9 @@ const initThreeScene = () => {
     mouse.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
     mouse.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
 
+    mouseParallax.x = (event.clientX / window.innerWidth) * 2 - 1;
+    mouseParallax.y = -(event.clientY / window.innerHeight) * 2 + 1;
+
     raycaster.setFromCamera(mouse, camera);
     const intersects = raycaster.intersectObjects(meshes, false);
 
@@ -505,6 +504,17 @@ const initThreeScene = () => {
   window.addEventListener("mousemove", onMouseMove);
 
   const animate = () => {
+    // Target position
+    const targetX = mouseParallax.x * parallaxStrength;
+    const targetY = mouseParallax.y * parallaxStrength;
+
+    // Smooth lerp
+    camera.position.x += (targetX - camera.position.x) * parallaxSmooth;
+    camera.position.y += (targetY - camera.position.y) * parallaxSmooth;
+
+    // Optional: biar tetap fokus ke center
+    camera.lookAt(0, 0, 0);
+
     renderer.render(scene, camera);
     requestAnimationFrame(animate);
   };
@@ -549,8 +559,9 @@ Best regards,`,
 };
 
 /* ====================== LIFECYCLE ====================== */
-onMounted(() => {
+onMounted(async () => {
   // Gunakan GSAP Context untuk memudahkan cleanup
+  await nextTick();
   ctx = gsap.context(() => {
     // TYPEWRITER EFFECT
     const roles = ["Software Developer", "Frontend Developer", "Fullstack Programmer"];
@@ -562,22 +573,95 @@ onMounted(() => {
       masterTl.add(tl);
     });
 
-    // PARALLAX HERO (Updated)
-    gsap.to(".hero-content", {
-      yPercent: -20,
-      scrollTrigger: { trigger: ".hero-section", scrub: true },
+    // CURSOR
+    const light = document.querySelector(".cursor-light");
+
+    window.addEventListener("mousemove", (e) => {
+      const rect = heroImage.value.getBoundingClientRect();
+
+      const x = e.clientX - rect.left;
+      const y = e.clientY - rect.top;
+
+      gsap.to(light, {
+        x: x,
+        y: y,
+        duration: 0.4,
+        ease: "power2.out",
+      });
     });
 
+    // PARALLAX HERO (Updated)
+    gsap
+      .timeline({
+        scrollTrigger: {
+          trigger: heroSection.value,
+          start: "top top",
+          end: "+=1500",
+          scrub: true,
+        },
+      })
+      .to(".bg-grid-hero", { y: -300, ease: "none" }, 0)
+      .to(
+        ".hero-text-wrapper",
+        {
+          y: 1050,
+          opacity: 0.8,
+          filter: "blur(2px)",
+          ease: "none",
+        },
+        0,
+      )
+      .to(
+        ".hero-image-wrapper",
+        {
+          y: 1050,
+          ease: "none",
+        },
+        0,
+      )
+      .to(
+        ".rectangle",
+        {
+          y: -250,
+          ease: "none",
+        },
+        0,
+      )
+      .to(
+        ".rectangle2",
+        {
+          y: -250,
+          ease: "none",
+        },
+        0,
+      )
+      .to(
+        ".circle4",
+        {
+          y: -350,
+          ease: "none",
+        },
+        0,
+      )
+      .to(
+        ".lineprofile",
+        {
+          y: -250,
+          ease: "none",
+        },
+        0,
+      );
+
     // Animasi masuk untuk profile container
-    gsap.from(".profile-container", {
-      scale: 0.8,
-      opacity: 0,
-      duration: 1.2,
-      ease: "power3.out",
-    });
+    // gsap.from(".profile-container", {
+    //   scale: 0.8,
+    //   opacity: 0,
+    //   duration: 1.2,
+    //   ease: "power3.out",
+    // });
     // 1. Hero Parallax
-    gsap.to(heroText.value, { y: -100, scrollTrigger: { trigger: "body", scrub: true } });
-    gsap.to(heroImage.value, { y: 50, scrollTrigger: { trigger: "body", scrub: true } });
+    // gsap.to(heroText.value, { y: -100, scrollTrigger: { trigger: "body", scrub: true } });
+    // gsap.to(heroImage.value, { y: 50, scrollTrigger: { trigger: "body", scrub: true } });
 
     // 2. Timeline Animation
     gsap.to(timelineLine.value, {
@@ -642,7 +726,7 @@ onUnmounted(() => {
 
 <template>
   <main class="text-white overflow-x-hidden">
-    <section class="hero-section relative min-h-screen flex items-center px-10 lg:px-24 overflow-hidden">
+    <!-- <section class="hero-section relative min-h-screen flex items-center px-10 lg:px-24">
       <div class="absolute inset-0 z-0 opacity-20 bg-grid-hero"></div>
 
       <div class="hero-content z-10 grid grid-cols-1 lg:grid-cols-2 gap-10 items-center w-full">
@@ -671,6 +755,78 @@ onUnmounted(() => {
 
             <img src="../assets/images/profile-line.svg" alt="" class="lineprofile" />
             <div ref="heroImage" class="profile-container overflow-hidden">
+              <img src="../assets/images/new-portfolio-profile.png" class="profile-img-styled" alt="Profile" />
+              <img src="../assets/images/profile-circle4.svg" alt="" class="circle4" />
+              <img src="../assets/images/profile-rectangle.svg" alt="" class="rectangle" />
+              <img src="../assets/images/profile-rectangle2.svg" alt="" class="rectangle2" />
+            </div>
+          </div>
+        </div>
+      </div>
+    </section> -->
+    <ClientOnly>
+      <SplashCursor
+        :SIM_RESOLUTION="128"
+        :DYE_RESOLUTION="1440"
+        :CAPTURE_RESOLUTION="512"
+        :DENSITY_DISSIPATION="3.5"
+        :VELOCITY_DISSIPATION="2"
+        :PRESSURE="0.7"
+        :PRESSURE_ITERATIONS="20"
+        :CURL="30"
+        :SPLAT_RADIUS="0.2"
+        :SPLAT_FORCE="9000"
+        :SHADING="true"
+        :COLOR_UPDATE_SPEED="10"
+        :BACK_COLOR="{ r: 0.5, g: 0, b: 0 }"
+        :TRANSPARENT="true"
+      />
+    </ClientOnly>
+    <section ref="heroSection" class="hero-section relative min-h-screen flex items-center px-10 lg:px-24 overflow-hidden">
+      <div class="absolute inset-0 z-0 opacity-20 bg-grid-hero"></div>
+
+      <div class="hero-content z-10 grid grid-cols-1 lg:grid-cols-2 gap-10 items-center w-full">
+        <!-- TEXT SIDE -->
+        <div class="hero-text-wrapper">
+          <div ref="heroText" class="space-y-4 mt-14">
+            <div class="flex items-center gap-2">
+              <span class="text-xl">Hi, I'm Rifqi Genta B.</span>
+            </div>
+
+            <h1 class="font-borel font-bold leading-tight pt-6">
+              <span class="typewriter text-white"></span>
+              <span class="cursor">|</span>
+            </h1>
+
+            <p class="text-gray-400 text-xl max-w-md italic font-borel">"Transforming complex logic into elegant, high-performance web experiences."</p>
+
+            <hr class="w-[70%]" />
+
+            <div class="flex gap-4">
+              <Button class="btn-linkedin" variant="outlined" severity="secondary">
+                <i class="pi pi-linkedin text-2xl"></i>
+              </Button>
+              <Button class="btn-instagram" variant="outlined" severity="secondary">
+                <i class="pi pi-instagram text-2xl"></i>
+              </Button>
+              <Button class="btn-github" variant="outlined" severity="secondary">
+                <i class="pi pi-github text-2xl"></i>
+              </Button>
+            </div>
+          </div>
+        </div>
+
+        <!-- IMAGE SIDE -->
+        <div class="flex justify-center lg:justify-end hero-image-wrapper">
+          <div class="profile-wrapper relative">
+            <div class="abs-shape shape-1"></div>
+            <div class="abs-shape shape-2"></div>
+            <div class="grid-box"></div>
+
+            <img src="../assets/images/profile-line.svg" alt="" class="lineprofile" />
+
+            <div ref="heroImage" class="profile-container overflow-hidden">
+              <div class="cursor-light"></div>
               <img src="../assets/images/new-portfolio-profile.png" class="profile-img-styled" alt="Profile" />
               <img src="../assets/images/profile-circle4.svg" alt="" class="circle4" />
               <img src="../assets/images/profile-rectangle.svg" alt="" class="rectangle" />
@@ -1015,6 +1171,11 @@ onUnmounted(() => {
 .hero-section {
   background-image: linear-gradient(to right bottom, #000000, #010000, #030001, #040001, #060001, #090001, #0c0002, #0e0002, #120002, #150003, #170103, #1a0103);
 }
+.hero-text-wrapper,
+.hero-image-wrapper,
+.bg-grid-hero {
+  will-change: transform;
+}
 .cube-section {
   background-image: linear-gradient(to right bottom, #000000, #010000, #030001, #040001, #060001, #090001, #0c0002, #0e0002, #120002, #150003, #170103, #1a0103);
   position: relative;
@@ -1072,7 +1233,17 @@ onUnmounted(() => {
   width: 100%;
   z-index: 2;
 }
-
+.cursor-light {
+  position: absolute;
+  width: 300px;
+  height: 300px;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.25) 0%, rgba(255, 255, 255, 0.15) 40%, transparent 70%);
+  pointer-events: none;
+  transform: translate(-50%, -50%);
+  filter: blur(40px);
+  opacity: 0.6;
+  transition: opacity 0.3s ease;
+}
 .profile-img-styled {
   width: 100%;
   border-radius: 0px 0px 200px 200px;
