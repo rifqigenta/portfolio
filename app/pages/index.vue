@@ -90,8 +90,8 @@ const experience = [
 ];
 
 const skills = [
-  { name: "HTML 5", icon: "/icons/three2/html.png", color: "#D81A0B", desc: "Manifesting the future with some high-level AI magic." },
-  { name: "CSS", icon: "/icons/three2/css.png", color: "#362584", desc: "Searching through billions of rows faster than I can find my keys." },
+  { name: "HTML 5", icon: "/icons/three2/html.png", color: "#D81A0B", desc: "Laying down the bones of every webpage. No HTML, no party." },
+  { name: "CSS", icon: "/icons/three2/css.png", color: "#362584", desc: "Making things pretty since forever. Flexbox and grid are my love languages." },
   { name: "JavaScript", icon: "/icons/javascript.png", color: "#F7DF1E", desc: "The OG chaos coordinator. It's not a bug, it's a feature!" },
   { name: "TypeScript", icon: "/icons/typescript.png", color: "#007ACC", desc: "JavaScript with a suit and tie. Safety first, no more undefined drama." },
   { name: "Bootstrap", icon: "/icons/three2/bootstrap.png", color: "#8F12FD", desc: "Old but gold. Reliable vibes for when you need a grid ASAP." },
@@ -104,7 +104,7 @@ const skills = [
   { name: "Flask", icon: "/icons/three2/flask.png", color: "#D9D9D9", desc: "Minimalist backend vibes. Small bottle, big impact." },
   { name: "Express", icon: "/icons/three2/express.png", color: "#D9D9D9", desc: "Fast, unopinionated, and sleek. The highway for your Node.js." },
   { name: "Git", icon: "/icons/three2/git.png", color: "#2A2A2A", desc: "Save point for your code. Time traveling made easy (until merge conflicts)." },
-  { name: "Figma", icon: "/icons/three2/figma.png", color: "#23272F", desc: "Manifesting the future with some high-level AI magic." },
+  { name: "Figma", icon: "/icons/three2/figma.png", color: "#23272F", desc: "From wireframe to wow-frame. Pixel pushing with purpose." },
   { name: "PostgreSQL", icon: "/icons/three2/postgresql.png", color: "#1E415D", desc: "The relational goat. Handles your data like a pro." },
   { name: "MySQL", icon: "/icons/three2/mysql.png", color: "#D9D9D9", desc: "The classic choice. Keeping tables organized since forever." },
   { name: "BigTable", icon: "/icons/three2/bigtable.png", color: "#D9D9D9", desc: "Massive data? No problem. Wide-column storage for the win." },
