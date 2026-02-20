@@ -788,15 +788,23 @@ onUnmounted(() => {
             <hr class="w-[70%]" />
 
             <div class="flex gap-4">
-              <Button class="btn-linkedin" variant="outlined" severity="secondary">
-                <i class="pi pi-linkedin text-2xl"></i>
-              </Button>
-              <Button class="btn-instagram" variant="outlined" severity="secondary">
-                <i class="pi pi-instagram text-2xl"></i>
-              </Button>
-              <Button class="btn-github" variant="outlined" severity="secondary">
-                <i class="pi pi-github text-2xl"></i>
-              </Button>
+              <a href="https://www.linkedin.com/in/rifqi-genta-buana-8b2971226/?locale=en_US" target="_blank" rel="noopener noreferrer">
+                <Button class="btn-linkedin" variant="outlined" severity="secondary">
+                  <i class="pi pi-linkedin text-2xl"></i>
+                </Button>
+              </a>
+
+              <a href="https://www.instagram.com/rg.buana?igsh=eGkyNzdzeWg3MXUx" target="_blank" rel="noopener noreferrer">
+                <Button class="btn-instagram" variant="outlined" severity="secondary">
+                  <i class="pi pi-instagram text-2xl"></i>
+                </Button>
+              </a>
+
+              <a href="https://github.com/rifqigenta" target="_blank" rel="noopener noreferrer">
+                <Button class="btn-github" variant="outlined" severity="secondary">
+                  <i class="pi pi-github text-2xl"></i>
+                </Button>
+              </a>
             </div>
           </div>
         </div>
