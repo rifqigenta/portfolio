@@ -81,6 +81,23 @@ function pointerPrototype(): Pointer {
   };
 }
 
+/* ---------- external color control ---------- */
+
+let useFixedColor = false;
+let fixedColor: ColorRGB = { r: 1, g: 0, b: 0 }; // default bebas
+
+function setFixedColor(color: ColorRGB | null) {
+  if (color) {
+    useFixedColor = true;
+    fixedColor = color;
+  } else {
+    useFixedColor = false;
+  }
+}
+
+defineExpose({
+  setFixedColor,
+});
 /* ---------- main logic ---------- */
 onMounted(() => {
   const canvas = canvasRef.value;
@@ -1076,6 +1093,10 @@ onMounted(() => {
 
   /* ---------- color helpers ---------- */
   function generateColor(): ColorRGB {
+    if (useFixedColor) {
+      return fixedColor;
+    }
+
     const c = HSVtoRGB(Math.random(), 1.0, 1.0);
     c.r *= 0.15;
     c.g *= 0.15;

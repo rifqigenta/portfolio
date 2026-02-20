@@ -5,7 +5,6 @@ import * as THREE from "three";
 import { TextPlugin } from "gsap/TextPlugin";
 import { RoundedBoxGeometry } from "three-stdlib";
 import SplashCursor from "~/components/ui/SplashCursor.vue";
-
 // Matikan SSR karena Three.js butuh akses langsung ke DOM/Window
 definePageMeta({
   layout: "default",
@@ -31,6 +30,7 @@ const timelineLine = ref(null);
 const timelineItems = ref([]);
 const cubeSection = ref(null);
 const canvas = ref<HTMLCanvasElement | null>(null);
+const splashRef = ref();
 
 /* ====================== DATA ====================== */
 const experience = [
@@ -532,23 +532,27 @@ const initThreeScene = () => {
   window.addEventListener("resize", handleResize);
 };
 
-const myEmail = "startrail1stacc@email.com";
+const myEmail = "rifqigentaschool@gmail.com";
 
 const openGmailCompose = () => {
-  const subject = encodeURIComponent("Project Inquiry from Portfolio");
+  const subject = encodeURIComponent("Introduction From <name>");
 
   const body = encodeURIComponent(
-    `Hi Zen,
+    `Hi,
 
-I’m interested in working with you.
+We would like to express our interest in discussing an opportunity for you to work with us at <name>.
 
-Here are the details of my project:
+Please find the preliminary details below:
 
-- Project type:
-- Budget:
-- Timeline:
+• Position / Project Type:
+• Scope of Work:
+• Compensation / Budget:
+• Expected Timeline:
+• Additional Information:
 
-Looking forward to your reply.
+We would appreciate the opportunity to discuss this further at your earliest convenience. Kindly let us know your availability.
+
+Thank you for your time and consideration.
 
 Best regards,`,
   );
@@ -668,6 +672,29 @@ onMounted(async () => {
       scaleY: 1,
       scrollTrigger: { trigger: timelineSection.value, start: "top center", end: "bottom center", scrub: true },
     });
+    ScrollTrigger.create({
+      trigger: timelineSection.value,
+      start: "top center",
+      end: "bottom center",
+
+      onEnter: () => {
+        // paksa hitam
+        splashRef.value?.setFixedColor({ r: 0, g: 0, b: 0 });
+      },
+
+      onEnterBack: () => {
+        splashRef.value?.setFixedColor({ r: 0, g: 0, b: 0 });
+      },
+
+      onLeave: () => {
+        // balik ke random
+        splashRef.value?.setFixedColor(null);
+      },
+
+      onLeaveBack: () => {
+        splashRef.value?.setFixedColor(null);
+      },
+    });
 
     timelineItems.value.forEach((item: any, i: number) => {
       gsap.from(item.querySelector(".timeline-card"), {
@@ -726,58 +753,21 @@ onUnmounted(() => {
 
 <template>
   <main class="text-white overflow-x-hidden">
-    <!-- <section class="hero-section relative min-h-screen flex items-center px-10 lg:px-24">
-      <div class="absolute inset-0 z-0 opacity-20 bg-grid-hero"></div>
-
-      <div class="hero-content z-10 grid grid-cols-1 lg:grid-cols-2 gap-10 items-center w-full">
-        <div ref="heroText" class="space-y-4 mt-14">
-          <div class="flex items-center gap-2">
-            <span class="text-xl">Hi, I'm Rifqi Genta B.</span>
-          </div>
-          <h1 class="font-borel font-bold leading-tight pt-6">
-            <span class="typewriter text-white"></span>
-            <span class="cursor">|</span>
-          </h1>
-          <p class="text-gray-400 text-xl max-w-md italic font-borel">"Transforming complex logic into elegant, high-performance web experiences."</p>
-          <hr class="w-[70%]" />
-          <div class="flex gap-4">
-            <Button class="btn-linkedin" variant="outlined" severity="secondary"><i class="pi pi-linkedin text-2xl"></i></Button>
-            <Button class="btn-instagram" variant="outlined" severity="secondary"><i class="pi pi-instagram text-2xl"></i></Button>
-            <Button class="btn-github" variant="outlined" severity="secondary"><i class="pi pi-github text-2xl"></i></Button>
-          </div>
-        </div>
-
-        <div class="flex justify-center lg:justify-end">
-          <div class="profile-wrapper relative">
-            <div class="abs-shape shape-1"></div>
-            <div class="abs-shape shape-2"></div>
-            <div class="grid-box"></div>
-
-            <img src="../assets/images/profile-line.svg" alt="" class="lineprofile" />
-            <div ref="heroImage" class="profile-container overflow-hidden">
-              <img src="../assets/images/new-portfolio-profile.png" class="profile-img-styled" alt="Profile" />
-              <img src="../assets/images/profile-circle4.svg" alt="" class="circle4" />
-              <img src="../assets/images/profile-rectangle.svg" alt="" class="rectangle" />
-              <img src="../assets/images/profile-rectangle2.svg" alt="" class="rectangle2" />
-            </div>
-          </div>
-        </div>
-      </div>
-    </section> -->
     <ClientOnly>
       <SplashCursor
+        ref="splashRef"
         :SIM_RESOLUTION="128"
         :DYE_RESOLUTION="1440"
-        :DENSITY_DISSIPATION="3.5"
-        :VELOCITY_DISSIPATION="2"
-        :PRESSURE="0.7"
+        :DENSITY_DISSIPATION="2.5"
+        :VELOCITY_DISSIPATION="1.5"
+        :PRESSURE="0.1"
         :CURL="30"
-        :SPLAT_RADIUS="0.2"
+        :SPLAT_RADIUS="0.55"
         :SPLAT_FORCE="9000"
         :COLOR_UPDATE_SPEED="10"
       />
     </ClientOnly>
-    <section ref="heroSection" class="hero-section relative min-h-screen flex items-center px-10 lg:px-24 overflow-hidden">
+    <section ref="heroSection" id="home" class="hero-section relative min-h-screen flex items-center px-10 lg:px-24 overflow-hidden">
       <div class="absolute inset-0 z-0 opacity-20 bg-grid-hero"></div>
 
       <div class="hero-content z-10 grid grid-cols-1 lg:grid-cols-2 gap-10 items-center w-full">
@@ -832,7 +822,7 @@ onUnmounted(() => {
       </div>
     </section>
 
-    <section ref="timelineSection" class="bg-white text-black py-20 relative">
+    <section ref="timelineSection" id="about" class="bg-white text-black py-20 relative">
       <h2 class="text-center text-5xl font-bold mb-20">Experience</h2>
       <div class="timeline-container relative max-w-5xl mx-auto px-4">
         <div class="timeline-axis">
@@ -871,7 +861,7 @@ onUnmounted(() => {
       </div>
     </section>
 
-    <section ref="aboutSection" class="h-screen flex flex-col justify-center">
+    <section ref="aboutSection" id="projects" class="h-screen flex flex-col justify-center">
       <h2 class="text-center text-4xl font-bold mb-10">Selected Projects</h2>
       <div class="overflow-hidden">
         <div ref="aboutTrack" class="flex gap-20 px-[10vw] w-fit">
@@ -1137,7 +1127,7 @@ onUnmounted(() => {
       </div>
     </section>
 
-    <section ref="cubeSection" class="relative h-screen flex flex-col items-center justify-center bg-none">
+    <section ref="cubeSection" id="skills" class="relative h-screen flex flex-col items-center justify-center bg-none">
       <h2 class="absolute top-16 text-4xl font-black text-white mb-4">Tech Stack</h2>
       <div class="absolute z-50 pointer-events-none text-center wrapper-skill-name">
         <!-- <div id="skill-name-display" class="text-7xl font-black text-white min-h-[100px] drop-shadow-[0_0_15px_rgba(255,255,255,0.3)] uppercase"></div> -->
@@ -1151,11 +1141,26 @@ onUnmounted(() => {
 
       <!-- <div class="absolute inset-0 pointer-events-none bg-[radial-gradient(circle_at_center,transparent_0%,#050505_80%)]"></div> -->
     </section>
-    <section class="min-h-screen cube-section flex justify-center items-center w-full">
+    <!-- <section class="min-h-screen cube-section flex justify-center items-center w-full">
       <div class="flex flex-col gap-12">
         <h2 class="text-4xl text-center text-white font-black opacity-70">Interested in working with me?</h2>
 
-        <button @click="openGmailCompose" class="border border-white mx-auto text-2xl px-6 py-4">Get in Touch</button>
+        <button @click="openGmailCompose" class="mx-auto text-2xl px-6 py-4"></button>
+      </div>
+    </section> -->
+    <section id="contact" class="relative min-h-screen flex items-center justify-center overflow-hidden contact-section">
+      <!-- subtle background glow -->
+      <div class="absolute w-[600px] h-[600px] bg-purple-600/20 blur-[160px] rounded-full"></div>
+
+      <div class="relative z-10 text-center max-w-3xl px-6">
+        <h2 class="text-5xl md:text-6xl font-black text-white leading-tight">
+          Let’s build something
+          <span class="py-6 block text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-500"> extraordinary together. </span>
+        </h2>
+
+        <p class="text-zinc-400 mt-6 text-lg">Available for the opportunities.</p>
+
+        <button @click="openGmailCompose" class="cta-btn mt-12">Get in Touch</button>
       </div>
     </section>
   </main>
@@ -1171,7 +1176,7 @@ onUnmounted(() => {
 .bg-grid-hero {
   will-change: transform;
 }
-.cube-section {
+.contact-section {
   background-image: linear-gradient(to right bottom, #000000, #010000, #030001, #040001, #060001, #090001, #0c0002, #0e0002, #120002, #150003, #170103, #1a0103);
   position: relative;
   overflow: hidden;
@@ -1460,5 +1465,29 @@ onUnmounted(() => {
 /* Animasi khusus untuk judul proyek agar lebih smooth saat ngetik */
 .project-title-type {
   letter-spacing: -0.02em;
+}
+.cta-btn {
+  position: relative;
+  padding: 18px 48px;
+  font-size: 1.3rem;
+  font-weight: 600;
+  border-radius: 999px;
+  background: linear-gradient(135deg, #7c3aed, #ec4899);
+  color: white;
+  transition: all 0.4s ease;
+  box-shadow:
+    0 0 20px rgba(168, 85, 247, 0.4),
+    0 0 40px rgba(236, 72, 153, 0.2);
+}
+
+.cta-btn:hover {
+  transform: translateY(-4px) scale(1.05);
+  box-shadow:
+    0 0 30px rgba(168, 85, 247, 0.6),
+    0 0 60px rgba(236, 72, 153, 0.4);
+}
+
+.cta-btn:active {
+  transform: scale(0.98);
 }
 </style>
